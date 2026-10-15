@@ -3,566 +3,1385 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SAHATA</title>
-<meta name="theme-color" content="#09090b">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Sahata">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
-<style>body{font-family:Inter,sans-serif;background:#09090b;color:#f4f4f5;padding-top:env(safe-area-inset-top)}
-.i{width:100%;background:#18181b;border:1px solid #27272a;border-radius:8px;padding:10px 14px;font-size:14px;color:#fff}
-.b{background:#fa541c;color:#fff;font-weight:700;border-radius:8px;padding:10px 18px;font-size:14px}
-.g{background:#27272a;color:#fff;font-weight:600;border-radius:8px;padding:10px 18px;font-size:14px}
-.c{background:#09090b;border:1px solid #27272a;border-radius:16px}
-.i{font-size:16px}button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}html{overscroll-behavior-y:none}
-#ov{height:100vh;height:100dvh;width:100vw}
-@media(max-width:640px){nav{position:fixed!important;top:auto!important;bottom:0;left:0;right:0;z-index:45;justify-content:space-around;border-top:1px solid #27272a;border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}
-nav button{flex:1;min-height:68px;justify-content:center;padding:10px 4px!important;font-size:12px!important;border-bottom:0!important;border-top:3px solid transparent}.e{font-size:24px;line-height:1}
-nav button.border-white{border-top-color:#fa541c!important}main{padding-bottom:120px!important}#toast{bottom:110px}}
-@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.2);color:#fa541c}100%{transform:scale(1)}}.pop{animation:pop .5s ease}
-@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}50%{box-shadow:0 0 26px 2px rgba(239,68,68,.35)}}.livecard{animation:glow 2s infinite;border-color:#ef4444!important}</style>
+<title>Service & Inspection</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f3f5;--ink:#101828;--mute:#667085;--ac:#ff6b35;--ac2:#d9531e;--line:#e4e7ec;--r:20px;--navy:#0f1b2d;--font:'Manrope',system-ui,sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);overflow:hidden;-webkit-font-smoothing:antialiased}
+button,input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.page{display:none;flex-direction:column;height:100dvh}
+.page.active{display:flex;animation:in .35s ease both}
+@keyframes in{from{opacity:0}}
+.scroll{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth}
+.body{flex:1;min-height:0;padding:20px clamp(14px,3vw,36px) 24px;display:flex;flex-direction:column;gap:16px;max-width:1400px;width:100%;margin:0 auto}
+.card{background:rgba(255,255,255,.76);border:1px solid var(--line);border-radius:var(--r)}
+
+/* header */
+.header{flex-shrink:0;position:relative;z-index:50;display:flex;align-items:center;justify-content:space-between;height:60px;padding:0 clamp(14px,3vw,36px);background:rgba(255,255,255,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.header-left{display:flex;align-items:center;gap:10px;cursor:pointer}
+.header-left img{width:32px}.header-left h1{margin:0;font-size:16px;font-weight:800}
+.header-right{display:flex;gap:4px;align-items:center}
+.menu-btn{font:600 14px var(--font);color:var(--ink);background:none;border:0;padding:8px 14px;border-radius:99px;cursor:pointer}
+.menu-btn:hover{background:var(--bg)}
+.menu-btn.active{background:var(--navy);color:#fff}
+.back-btn,.save-btn{font:700 14px var(--font);border:0;border-radius:99px;padding:10px 20px;cursor:pointer}
+.back-btn{background:var(--bg)}.save-btn{background:var(--ac);color:#fff}.save-btn:disabled{opacity:.6}
+.dropdown{position:relative}
+.dropdown-content{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;min-width:170px;padding:6px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:0 16px 40px rgba(16,24,40,.14);z-index:80}
+.dropdown-content::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
+.dropdown.open .dropdown-content{display:block}
+@media(hover:hover){.dropdown:hover .dropdown-content{display:block}}
+.dropdown-content button{display:block;width:100%;text-align:left;font:600 14px var(--font);background:none;border:0;padding:10px 12px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.dropdown-content button:hover{background:rgba(255,107,53,.12);color:var(--ac2)}
+.burger{display:none;width:42px;height:42px;border:0;border-radius:50%;background:none;font-size:22px;cursor:pointer;color:inherit}
+
+/* welcome */
+.welcome{position:relative;color:#fff;background:#120a06 url('https://lh3.googleusercontent.com/d/1Yn4gV7V-0lnH3cCU9NzWzdkXwVrUin82=w2000') center top/103% auto no-repeat}
+@media(orientation:portrait){.welcome{background-size:cover}}
+.welcome-header{position:absolute;top:20px;left:clamp(14px,3vw,36px);display:flex;align-items:center;gap:12px;font-size:20px;font-weight:800;text-shadow:0 1px 6px #000a}
+.welcome-header img{height:50px}
+.boiler-hero{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);width:max-content;max-width:96vw;text-align:center;font-size:clamp(22px,4.6vw,44px);color:#fffaf3;pointer-events:none}
+.boiler-hero::before{content:"";position:absolute;inset:-40% -14%;z-index:-1;background:radial-gradient(closest-side,rgba(6,28,18,.55),transparent);filter:blur(10px)}
+.boiler-title{margin:0;white-space:nowrap;text-shadow:0 0 1px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.55),0 0 12px rgba(74,222,128,.8),0 0 28px rgba(74,222,128,.55);animation:heroGlow 3.4s ease-in-out infinite}
+.boiler-sub{width:0;min-width:100%;margin:.6em 0 0;font-family:var(--fh);font-size:max(.3em,10px);font-weight:600;text-transform:uppercase;text-align:left;white-space:nowrap;text-shadow:0 0 1px rgba(0,0,0,.6),0 1px 4px rgba(0,0,0,.6),0 0 10px rgba(74,222,128,.7)}
+@keyframes heroGlow{50%{text-shadow:0 0 1px rgba(0,0,0,.6),0 2px 6px rgba(0,0,0,.55),0 0 18px rgba(134,239,172,.95),0 0 42px rgba(74,222,128,.75)}}
+.button-group{position:absolute;top:16px;right:clamp(14px,3vw,36px);display:flex;gap:2px;padding:5px;border-radius:99px;background:rgba(0,0,0,.18);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid transparent;z-index:60}
+.button-group .menu-btn{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)}.button-group .menu-btn:hover{background:rgba(255,255,255,.22)}
+
+/* split: ring + list */
+.head h1{margin:0;font-size:clamp(24px,3.4vw,36px);font-weight:800;letter-spacing:-.03em}
+.head p{margin:4px 0 0;color:var(--mute);font-size:15px}
+.split{flex:1;min-height:0;display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px}
+.ringcard{padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.ring{position:relative;width:min(100%,260px);aspect-ratio:1}
+.ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.ctr b{font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1}.ctr span{font-size:12px;color:var(--mute);margin-top:4px}
+.lg{display:flex;flex-direction:column;gap:8px;width:100%}
+.lg span{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600}
+.lg i{width:10px;height:10px;border-radius:50%}.lg b{margin-left:auto;font-weight:800}
+.tablecard{overflow:auto;min-height:0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+thead th{position:sticky;top:0;z-index:2;background:#fff;color:var(--mute);padding:14px 10px;font-size:12px;font-weight:700;border-bottom:1px solid var(--line)}
+th,td{padding:11px 10px;text-align:center;border-bottom:1px solid #f0f1f4}
+td[rowspan]{font-weight:700;background:#fafbfc}
+tbody tr:hover td:not([rowspan]){background:#fff7f3}
+td a{color:var(--ac2);font-weight:700;text-decoration:none}td a:hover{text-decoration:underline}
+.pill{display:inline-block;padding:4px 12px;border-radius:99px;font-weight:700;font-size:12px;white-space:nowrap}
+.pill[data-act]{cursor:pointer}.pill[data-act]:hover{filter:brightness(.95)}
+.p-ok{background:#dcfce7;color:#15803d}.p-warn{background:#fef3c7;color:#92400e}.p-bad{background:#fee2e2;color:#b91c1c}.p-none{background:#eef0f3;color:#475467}
+input[type=date],input[type=file],.filter-select{max-width:100%;padding:9px 12px;border-radius:12px;border:1px solid var(--line);background:#fff;font-size:14px}
+.save-row{display:flex;justify-content:flex-end;padding:14px}
+.detail h3{margin:8px 0 0;font-size:20px}
+.detail .tablecard{flex:none;max-height:none}
+
+/* summary */
+.sum{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;align-content:start}
+.sum .card{padding:18px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.sum h3{margin:0}.sum .ring{width:180px}.sum .ctr b{font-size:32px}
+.sum .tablecard{width:100%;max-height:300px;border:1px solid var(--line);border-radius:14px}
+
+/* profile */
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(20px,4vw,56px);align-items:center;max-width:1240px;margin:0 auto;padding:clamp(20px,4vw,48px) clamp(14px,3vw,36px) 8px}
+.hero h2{margin:0 0 14px;font-size:clamp(32px,5.5vw,60px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
+.hero p{margin:0 0 10px;color:var(--mute);line-height:1.7;font-size:15px;max-width:68ch}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{padding:20px;border-radius:var(--r);background:var(--navy);color:#fff}
+.stat:nth-child(2){background:var(--ac)}.stat:nth-child(3){background:rgba(255,255,255,.76);color:var(--ink);border:1px solid var(--line)}.stat:nth-child(4){background:#e8edf5;color:var(--ink)}
+.stat b{display:block;font-size:34px;font-weight:800;letter-spacing:-.03em}.stat span{font-size:13px;opacity:.85}
+.cwrap{position:relative;padding:12px 0 60px}
+.track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:60px clamp(14px,6vw,80px) 24px;scrollbar-width:none;scroll-behavior:smooth}
+.track::-webkit-scrollbar{display:none}
+.track{padding-left:max(14px,calc(50% - min(84vw,320px)/2));padding-right:max(14px,calc(50% - min(84vw,320px)/2))}
+.person{flex:0 0 min(84vw,320px);scroll-snap-align:center;background:rgba(255,255,255,.76);border:1px solid var(--line);border-radius:28px;text-align:center;padding:0 22px 24px;transition:transform .3s}
+.person:hover{transform:translateY(-6px)}
+.person .band{height:84px;margin:0 -22px;border-radius:28px 28px 0 0;background:linear-gradient(120deg,var(--navy),#27405f 60%,var(--ac))}
+.person img{width:116px;height:116px;border-radius:50%;object-fit:cover;border:5px solid #fff;margin-top:-58px;box-shadow:0 10px 24px rgba(16,24,40,.2)}
+.person h2{margin:12px 0 2px;font-size:19px;font-weight:800}.person .role{margin:0 0 10px;color:var(--ac2);font-size:13px;font-weight:700}
+.grp{margin-top:12px;text-align:left}.grp small{display:block;margin-bottom:6px;color:var(--mute);font-size:12px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips span{padding:5px 11px;border-radius:99px;background:var(--bg);font-size:12px;font-weight:600}
+.mail{display:inline-block;margin-top:16px;padding:9px 20px;border-radius:99px;background:var(--navy);color:#fff;font-size:13px;font-weight:700;text-decoration:none}
+.arr{position:absolute;top:50%;z-index:5;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:20px;cursor:pointer;box-shadow:0 8px 20px rgba(16,24,40,.12)}
+.arr.l{left:14px}.arr.r{right:14px}.arr:hover{background:var(--ac);color:#fff}
+
+/* innovation */
+.snap{scroll-snap-type:y proximity}
+.sec{display:flex;gap:clamp(20px,5vw,64px);align-items:center;justify-content:center;min-height:calc(100dvh - 60px);padding:clamp(24px,5vw,64px) clamp(16px,5vw,80px);scroll-snap-align:start}
+.sec:nth-child(even){background:#fff}
+.sec.v{flex-direction:column;text-align:center}
+.col{flex:1;min-width:0;max-width:620px}
+.sec h2{margin:0 0 14px;font-size:clamp(28px,4.4vw,52px);font-weight:800;letter-spacing:-.035em;line-height:1.06}
+.sec p,.sec li{font-size:clamp(15px,1.6vw,19px);line-height:1.7;color:#475467}
+.hint{color:var(--ac2)!important;font-weight:700}
+.pic{max-width:100%;max-height:66dvh;border-radius:28px;box-shadow:0 24px 60px rgba(16,24,40,.18);transition:opacity .8s}
+.ratio{position:relative;width:100%;max-width:960px;aspect-ratio:16/9;border-radius:24px;overflow:hidden;background:#000;box-shadow:0 24px 60px rgba(16,24,40,.2)}
+.ratio iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.chartbox{position:relative;width:100%;max-width:1100px;height:min(56vh,480px);padding:20px}
+.contact-box{padding:36px 44px}.contact-box h2{font-size:30px}.contact-box a{color:var(--ac2);font-weight:800}
+
+/* assessment */
+.as-main{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,3fr) minmax(260px,1fr);gap:16px}
+.as-main>div{display:flex;flex-direction:column;gap:14px;min-width:0;min-height:0}
+.slicer{display:flex;flex-wrap:wrap;gap:10px}
+.chart-wrap{flex:1;position:relative;min-height:300px;padding:20px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-card{padding:16px 12px;text-align:center}
+.info-card .label{font-size:12px;font-weight:700;color:var(--mute)}
+.info-card .value{margin-top:6px;font-size:clamp(14px,1.5vw,17px);font-weight:800}
+.info-avg{background:var(--navy)!important;color:#fff;border:0}.info-avg .label{color:#cbd5e1}.info-avg .value{font-size:clamp(34px,4vw,48px);color:var(--ac)}
+.missing-box{padding:16px;flex:1;min-height:0;overflow:auto}.missing-box h4{margin:0 0 8px;font-size:14px}
+.missing-list{margin:0;padding-left:18px;columns:2;font-size:13px}
+#btnAssessmentAction{position:fixed;bottom:30px;right:110px;z-index:900;border:0;cursor:pointer;font:700 14px var(--font);color:#fff;padding:12px 22px;border-radius:99px;background:var(--navy);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+#btnAssessmentAction:hover{background:var(--ac)}
+
+/* login */
+#uploaderLoginModal{display:none;position:fixed;inset:0;background:rgba(15,27,45,.5);backdrop-filter:blur(8px);align-items:center;justify-content:center;z-index:2000;padding:16px}
+.login-box{background:#fff;border-radius:28px;width:min(100%,380px);padding:30px 28px}
+.login-box h3{margin:0 0 14px;text-align:center;font-size:22px}
+.login-box label{display:block;font-size:12px;font-weight:700;margin:12px 0 5px;color:var(--mute)}
+.login-box input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-size:16px}
+#loginMsg{color:#b91c1c;font-size:13px;text-align:center;min-height:18px;margin:12px 0}
+.login-actions{display:flex;gap:10px}.login-actions button{flex:1;padding:12px;border-radius:99px;border:0;cursor:pointer;font-weight:700;font-size:15px}
+#uploaderLoginButton{background:var(--ac);color:#fff}.btn-cancel{background:var(--bg)}
+
+/* MinBoi */
+#minBoiIcon{width:95px;height:95px;position:relative;top:-12px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));animation:fl 3s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-7px)}}
+@keyframes sh{25%{transform:rotate(3deg)}75%{transform:rotate(-3deg)}}
+#chatFAB:hover #minBoiIcon{animation:fl 2s ease-in-out infinite,sh .5s ease-in-out infinite}
+#chatFAB{position:fixed;bottom:28px;right:28px;width:70px;height:70px;background:#fff;border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.25);display:flex;justify-content:center;align-items:center;cursor:pointer;z-index:1000}
+#aiChatWidget{position:fixed;bottom:100px;right:28px;width:340px;height:400px;background:#fff;border-radius:20px;box-shadow:0 12px 40px rgba(0,0,0,.3);z-index:999;overflow:hidden;visibility:hidden;display:flex;flex-direction:column;transform:scale(.95);opacity:0;transition:.25s;resize:both;min-width:300px;min-height:300px;max-width:calc(100vw - 20px);max-height:calc(100dvh - 120px)}
+#aiChatWidget.visible{visibility:visible;opacity:1;transform:none}
+#aiChatHeader{padding:14px 16px;background:var(--navy);color:#fff;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+#closeChatBtn{background:none;border:0;color:#fff;font-size:26px;cursor:pointer}
+#aiChatBody{flex:1;overflow-y:auto;padding:14px;background:var(--bg)}
+#aiMessages{display:flex;flex-direction:column;gap:10px}
+.msg{padding:10px 14px;border-radius:18px;max-width:80%;font-size:14px}
+.msg.user{background:var(--ac);color:#fff;align-self:flex-end}.msg.bot{background:#fff;align-self:flex-start}
+#aiChatInput{display:flex;padding:10px;border-top:1px solid var(--line)}
+#aiUserInput{flex:1;padding:10px 15px;border:1px solid var(--line);border-radius:20px;outline:none}
+#aiSendBtn{background:var(--navy);color:#fff;border:0;border-radius:20px;padding:0 16px;margin-left:8px;cursor:pointer}
+
+@media(max-width:900px){
+  .split,.as-main,.hero{grid-template-columns:1fr}
+  .body{overflow-y:auto}.split{flex:none}.ringcard{flex-direction:row;flex-wrap:wrap}.tablecard{max-height:60vh}
+  .sec{flex-direction:column;min-height:auto}.missing-list{columns:1}
+  #btnAssessmentAction{right:16px;bottom:100px}.arr{display:none}
+}
+@media(max-width:760px){
+  .burger{display:block}
+  .header-right,.button-group{display:none;position:fixed;top:64px;left:10px;right:10px;flex-direction:column;align-items:stretch;padding:10px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:0 20px 50px rgba(0,0,0,.2);max-height:80dvh;overflow:auto}
+  .menu-open .header-right,.menu-open .button-group{display:flex}
+  .button-group .menu-btn{color:var(--ink)}
+  .menu-btn{text-align:left;font-size:16px}.dropdown{position:static}.dropdown>.menu-btn{pointer-events:none;color:var(--mute);font-size:12px}
+  .dropdown-content{display:block;position:static;transform:none;border:0;box-shadow:none;margin:0;padding:0 0 4px 8px}
+  .welcome .burger{position:absolute;top:12px;right:12px;color:#fff;background:rgba(0,0,0,.35)}
+  #chatFAB{right:14px;bottom:14px}#aiChatWidget{right:10px;bottom:92px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* ===== Profile carousel: kartu aktif di tengah + dots ===== */
+.person{opacity:.5;transform:scale(.94);transition:transform .35s,opacity .35s,box-shadow .35s}
+.person.on{opacity:1;transform:scale(1);box-shadow:0 24px 50px rgba(16,24,40,.16)}
+.person:hover{transform:scale(1)}
+.dots{position:absolute;left:0;right:0;bottom:18px;display:flex;justify-content:center;gap:7px}
+.dots button{width:8px;height:8px;border-radius:99px;border:0;background:#cfd4dc;padding:0;cursor:pointer;transition:all .3s}
+.dots button.on{width:26px;background:var(--ac)}
+
+/* ===== INOVASI: BI SMART · MATA SMART · DASHBOARD S&I ===== */
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+.ap-bi{--a:#0077B6;--b:#00B4D8;--c:#7c3aed;--k:#03045e;--t:#e0f4ff}
+.ap-mata{--a:#4e5c00;--b:#e3a72f;--c:#2f7d3a;--k:#132b15;--t:#ebf2a3}
+.ap-si{--a:#1B4332;--b:#52B788;--c:#D68910;--k:#14301F;--t:#E8F3EC}
+.sec.ap{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--t),#fff 50%,var(--t));background-size:250% 250%;animation:apbg 14s ease infinite}
+@keyframes apbg{50%{background-position:100% 50%}}
+.ap .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:.45;pointer-events:none;animation:apbl 12s ease-in-out infinite}
+.ap .blob.x{width:320px;height:320px;background:var(--b);top:-80px;right:-60px}
+.ap .blob.y{width:280px;height:280px;background:var(--c);bottom:-90px;left:-60px;animation-delay:-5s}
+@keyframes apbl{50%{transform:translate(40px,-30px) scale(1.15)}}
+.ap .col{position:relative;z-index:1}
+.ap h2{color:var(--k)}
+.ap h2.big{font-size:clamp(34px,6vw,68px);background:linear-gradient(90deg,var(--a),var(--b),var(--c),var(--a));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:apt 6s linear infinite}
+@keyframes apt{to{background-position:300% 0}}
+.ap-tag{display:inline-block;margin-bottom:14px;padding:6px 14px;border-radius:99px;background:linear-gradient(90deg,var(--a),var(--c));color:#fff;font-weight:800;font-size:12.5px}
+.chips2{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.chips2 span{padding:7px 14px;border-radius:99px;font-size:13px;font-weight:700;color:#fff;background:var(--a);animation:chp 3s ease-in-out infinite}
+.chips2 span:nth-child(2n){background:var(--c);animation-delay:.4s}.chips2 span:nth-child(3n){background:var(--b);color:var(--k);animation-delay:.8s}
+@keyframes chp{50%{transform:translateY(-4px)}}
+/* kartu fitur */
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;width:100%;text-align:left;margin-top:10px}
+.fc{position:relative;display:block;padding:22px;border-radius:22px;background:#fff;border:1px solid var(--line);overflow:hidden;transition:transform .25s,box-shadow .25s}
+.fc::before{content:'';position:absolute;inset:0 0 auto 0;height:5px;background:linear-gradient(90deg,var(--a),var(--b),var(--c));background-size:200% 100%;animation:apt 4s linear infinite}
+.fc:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(16,24,40,.15)}
+.fc i{display:grid;place-items:center;width:50px;height:50px;border-radius:15px;font-style:normal;font-size:24px;margin-bottom:14px;background:linear-gradient(135deg,var(--t),#fff);box-shadow:0 6px 16px rgba(16,24,40,.12);animation:chp 3.4s ease-in-out infinite}
+.fc b{display:block;font-size:17px;color:var(--k);margin-bottom:6px}.fc p{margin:0 0 12px;font-size:13.5px;line-height:1.6;color:var(--mute)}
+.fc u{text-decoration:none;font-weight:800;font-size:13px;color:var(--a)}
+/* modal analogi */
+#apm{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,27,45,.55);backdrop-filter:blur(8px)}
+#apm.on{display:flex}
+.apc{position:relative;width:min(100%,520px);max-height:88dvh;overflow:auto;padding:28px;border-radius:28px;background:#fff;animation:apin .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes apin{from{opacity:0;transform:translateY(30px) scale(.94)}}
+.apc>button{position:absolute;top:14px;right:16px;width:34px;height:34px;border-radius:50%;background:var(--bg);font-size:16px;text-align:center}
+.apc .ic2{display:grid;place-items:center;width:56px;height:56px;border-radius:18px;font-size:28px;background:linear-gradient(135deg,var(--a),var(--b));margin-bottom:12px}
+.apc h3{margin:0 0 12px;font-size:22px;color:var(--k)}
+.ana{padding:14px 16px;border-radius:16px;background:var(--t);color:var(--k);font-size:14px;line-height:1.65;margin-bottom:14px}
+.ana small{display:block;font-weight:800;margin-bottom:4px;color:var(--a)}
+.apc h4{margin:0 0 8px;font-size:13px;color:var(--mute)}
+.apc ol,.apc ul{margin:0;padding:0;list-style:none;counter-reset:s}
+.apc li{position:relative;padding:8px 0 8px 38px;font-size:14px;line-height:1.55;border-bottom:1px solid var(--line)}
+.apc li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--a),var(--c))}
+.apc ul li::before{content:'✓'}
+/* carousel preview */
+.pcar{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pf{position:relative;width:250px;height:500px;padding:8px;border-radius:38px;background:#0b1220;box-shadow:0 30px 70px rgba(16,24,40,.4);animation:apf 6s ease-in-out infinite}
+@keyframes apf{50%{transform:translateY(-9px) rotate(-1deg)}}
+.pf::before{content:'';position:absolute;top:14px;left:50%;width:70px;height:18px;margin-left:-35px;border-radius:99px;background:#0b1220;z-index:5}
+.lap .pf{width:min(560px,92vw);height:auto;aspect-ratio:16/10;border-radius:16px;padding:10px}.lap .pf::before{display:none}
+.scs{position:relative;height:100%;border-radius:30px;overflow:hidden;background:#f6f8fb}.lap .scs{border-radius:8px}
+.sc{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;transform:translateX(30px) scale(.97);transition:.5s;font-size:11px;color:#101828;pointer-events:none}
+.sc.on{opacity:1;transform:none}
+.st{padding:28px 14px 14px;color:#fff;background:linear-gradient(135deg,var(--k),var(--a),var(--b));background-size:200% 200%;animation:apbg 8s ease infinite}.lap .st{padding:12px 14px}
+.st small{display:block;opacity:.7}.st b{font-size:16px}
+.sb{flex:1;padding:12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.r3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sx{background:#fff;border-radius:12px;padding:9px 4px;text-align:center;font-size:8px;font-weight:800;color:#667085;border-top:3px solid var(--x)}.sx b{display:block;font-size:19px;color:var(--x)}
+.sr{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:12px;padding:10px;font-weight:700}
+.sr em{font-style:normal;font-size:9px;padding:3px 8px;border-radius:99px;background:#dcfce7;color:#15803d}.sr em.w{background:#fef3c7;color:#92400e}.sr em.x{background:#fee2e2;color:#b91c1c}
+.sc.on .sr,.sc.on .tl,.sc.on .sx{animation:sri .5s both}
+.sc.on :nth-child(2){animation-delay:.1s}.sc.on :nth-child(3){animation-delay:.2s}.sc.on :nth-child(4){animation-delay:.3s}.sc.on :nth-child(5){animation-delay:.4s}
+@keyframes sri{from{opacity:0;transform:translateX(-14px)}}
+.bar{height:8px;border-radius:9px;background:#e5e7eb;overflow:hidden}.bar i{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--a),var(--b),var(--c));transform-origin:left}
+.sc.on .bar i{animation:gr 1.1s .3s both}.sc.on .tm i{animation:tm 5s linear both}
+@keyframes gr{from{transform:scaleX(0)}}@keyframes tm{to{transform:scaleX(0)}}
+.dn{width:92px;aspect-ratio:1;margin:4px auto;border-radius:50%;background:conic-gradient(var(--b),var(--a) calc(var(--p)*1%),#e5e7eb 0);-webkit-mask:radial-gradient(circle 29px,#0000 97%,#000);mask:radial-gradient(circle 29px,#0000 97%,#000)}
+.sc.on .dn{animation:dsw 1.3s .2s both}@keyframes dsw{from{--p:0}to{--p:var(--v)}}
+.ct{margin:0;text-align:center;font-weight:800;color:var(--k)}
+.cols{display:flex;align-items:flex-end;gap:8px;height:74px}.cols i{flex:1;height:var(--h);border-radius:8px 8px 0 0;background:linear-gradient(var(--b),var(--a));transform-origin:bottom}
+.sc.on .cols i{animation:up .8s both}.cols i:nth-child(2){animation-delay:.15s!important}.cols i:nth-child(3){animation-delay:.3s!important}.cols i:nth-child(4){animation-delay:.45s!important}
+@keyframes up{from{transform:scaleY(0)}}
+.btn{padding:10px;border-radius:12px;text-align:center;font-weight:800;color:#fff;background:linear-gradient(90deg,var(--a),var(--b));animation:chp 2s ease-in-out infinite}.btn.g{background:linear-gradient(90deg,var(--c),var(--a))}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tl{background:#fff;border-radius:14px;padding:12px 6px;text-align:center;font-weight:800}.tl span{display:block;font-size:22px}.tl em{font-style:normal;font-size:9px;color:var(--a)}
+.sn{display:flex;justify-content:space-around;padding:9px 2px 12px;background:#fff;font-size:8px;font-weight:800;color:#98a2b3}.sn .on{color:var(--a);transform:scale(1.15)}
+.cap{font-weight:800;color:var(--k)}
+.dts{display:flex;gap:7px}.dts button{width:9px;height:9px;border-radius:99px;background:#cfd4dc;padding:0;transition:.3s}.dts button.on{width:28px;background:linear-gradient(90deg,var(--a),var(--c))}
+@media(prefers-reduced-motion:reduce){.ap *,.fc::before{animation:none!important}}
+
+/* ===== PALET MODERN: indigo + cyan di atas navy ===== */
+:root{--bg:#f4f6fb;--ink:#0b1220;--mute:#64748b;--ac:#6366f1;--ac2:#4f46e5;--line:#e5e8f1;--navy:#0b1020}
+body{background:radial-gradient(1100px 560px at 8% -10%,#e0e7ff 0,transparent 60%),radial-gradient(900px 480px at 100% 0,#cffafe 0,transparent 55%),var(--bg)}
+.card{box-shadow:0 8px 28px rgba(15,23,42,.05)}
+.menu-btn.active{background:linear-gradient(135deg,#4f46e5,#06b6d4);color:#fff}
+.dropdown-content button:hover{background:rgba(99,102,241,.12);color:var(--ac2)}
+.save-btn,#uploaderLoginButton{background:linear-gradient(135deg,#6366f1,#06b6d4)}
+#btnAssessmentAction{background:linear-gradient(135deg,#0b1020,#312e81)}
+#btnAssessmentAction:hover{background:linear-gradient(135deg,#6366f1,#06b6d4)}
+.stat{background:linear-gradient(135deg,#0b1020,#1e1b4b)}
+.stat:nth-child(2){background:linear-gradient(135deg,#6366f1,#06b6d4)}
+.stat:nth-child(4){background:#eef2ff}
+.person .band{background:linear-gradient(120deg,#0b1020,#312e81 55%,#06b6d4)}
+.person .role{color:var(--ac2)}
+.chips span{background:#eef2ff;color:#4338ca}
+.mail{background:linear-gradient(135deg,#0b1020,#312e81)}
+.info-avg{background:linear-gradient(135deg,#0b1020,#1e1b4b)!important}
+.info-avg .value{color:#22d3ee}
+#aiChatHeader{background:linear-gradient(135deg,#0b1020,#312e81)}
+.msg.user,#aiSendBtn{background:linear-gradient(135deg,#6366f1,#06b6d4)}
+
+/* ===== carousel: semua kartu bisa di tengah ===== */
+.track{padding-left:max(14px,calc(50% - min(84vw,320px)/2));padding-right:max(14px,calc(50% - min(84vw,320px)/2))}
+
+/* ===== KARTU FITUR: besar, 3 per baris, muat 1 layar ===== */
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+.sec.ap.v{padding-top:18px;padding-bottom:18px;justify-content:center}
+.sec.ap.v h2{font-size:clamp(24px,4vw,40px);margin-bottom:6px}
+.fgrid{grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:clamp(10px,2vw,20px);width:100%;max-width:900px;height:min(68dvh,640px);margin:8px auto 0}
+.fc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.6vw,16px);padding:10px;text-align:center;border-radius:28px;cursor:pointer;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 12px 34px rgba(15,23,42,.09);opacity:0;animation:fcIn .65s cubic-bezier(.2,.9,.3,1) forwards;transition:transform .35s,box-shadow .35s}
+.fc:nth-child(2){animation-delay:.07s}.fc:nth-child(3){animation-delay:.14s}.fc:nth-child(4){animation-delay:.21s}
+.fc:nth-child(5){animation-delay:.28s}.fc:nth-child(6){animation-delay:.35s}.fc:nth-child(7){animation-delay:.42s}
+@keyframes fcIn{from{opacity:0;transform:translateY(26px) scale(.92)}to{opacity:1;transform:none}}
+/* garis cahaya berputar mengelilingi kartu */
+.fc::before{content:'';position:absolute;inset:0;height:auto;padding:2px;border-radius:inherit;
+  background:conic-gradient(from var(--ang),transparent 0 62%,var(--b),var(--c),transparent);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:fcSpin 5s linear infinite}
+@keyframes fcSpin{to{--ang:360deg}}
+.fc i{position:relative;display:grid;place-items:center;width:clamp(56px,10vw,92px);height:clamp(56px,10vw,92px);margin:0;border-radius:28px;
+  font-size:clamp(28px,5vw,46px);background:linear-gradient(135deg,var(--a),var(--c));box-shadow:0 14px 30px rgba(15,23,42,.22);animation:fcFloat 3.6s ease-in-out infinite}
+@keyframes fcFloat{50%{transform:translateY(-7px) rotate(-3deg)}}
+/* cincin SVG putus-putus berputar di belakang ikon */
+.fc i::after{content:'';position:absolute;inset:-9px;pointer-events:none;animation:fcRing 14s linear infinite;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='47' fill='none' stroke='%236366f1' stroke-opacity='.55' stroke-width='2' stroke-dasharray='5 9' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+@keyframes fcRing{to{transform:rotate(360deg)}}
+.fc b{margin:0;font-size:clamp(12px,1.9vw,18px);line-height:1.25;color:var(--k)}
+.fc p,.fc u{display:none}
+.fc:hover,.fc:focus-visible{transform:translateY(-8px) scale(1.035);box-shadow:0 22px 50px rgba(15,23,42,.2)}
+.fc:active{transform:scale(.97)}
+@media(max-width:480px){.fc{border-radius:20px;padding:6px}.fc i{border-radius:20px}}
+@media(prefers-reduced-motion:reduce){.fc{opacity:1!important}}
+
+/* ===== tabel simulasi ===== */
+.simtb tbody tr{cursor:pointer;transition:background .15s}
+.simtb tbody tr:hover td{background:#eef2ff}
+.sd{display:inline-grid;place-items:center;width:24px;height:24px;margin:0 2px;border-radius:8px;font-style:normal;font-size:12px;font-weight:800}
+.sd.ok{background:#dcfce7;color:#15803d}
+.sd.no{background:#fee2e2;color:#b91c1c}
+.sdm-shifts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.sdm-shifts>div{padding:12px;border-radius:14px;background:#f4f6fb;text-align:center}
+.sdm-shifts small{display:block;margin-bottom:6px;font-weight:800;color:var(--mute)}
+.sdm-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.4}
+.sdm-row span{flex:1}
+.sdm-row em{font-style:normal;font-size:12px;color:var(--mute);white-space:nowrap}
+.sdm-chips{display:flex;flex-wrap:wrap;gap:6px}
+.sdm-chips span{padding:5px 11px;border-radius:99px;background:#eef0f3;color:#98a2b3;font-size:12px;font-weight:600}
+.sdm-chips span.on{background:#dcfce7;color:#15803d}
+
+/* ================================================================
+   v2: FOREST GREEN & WHITE + gaya Apple/Figma
+   ================================================================ */
+:root{--bg:#f4f7f4;--ink:#0d1f17;--mute:#5d7066;--ac:#1f7a56;--ac2:#14573f;--line:#e2e9e4;--navy:#0f2e22}
+body{background:radial-gradient(1100px 560px at 8% -10%,#e2f0e7 0,transparent 60%),radial-gradient(900px 480px at 100% 0,#eef4e4 0,transparent 55%),var(--bg)}
+.menu-btn.active{background:linear-gradient(135deg,#0f2e22,#1f7a56);color:#fff}
+.dropdown-content button:hover{background:rgba(31,122,86,.1);color:var(--ac2)}
+.save-btn,#uploaderLoginButton,.msg.user,#aiSendBtn{background:linear-gradient(135deg,#14573f,#2a9468)}
+#btnAssessmentAction{background:linear-gradient(135deg,#0f2e22,#14573f)}
+#btnAssessmentAction:hover{background:linear-gradient(135deg,#14573f,#2a9468)}
+.stat{background:linear-gradient(135deg,#0f2e22,#14573f)}
+.stat:nth-child(2){background:linear-gradient(135deg,#1f7a56,#3fa877)}
+.stat:nth-child(4){background:#e6f1ea;color:var(--ink)}
+.person .band{background:linear-gradient(120deg,#0f2e22,#14573f 55%,#3fa877)}
+.chips span{background:#e6f1ea;color:#14573f}
+.mail{background:linear-gradient(135deg,#0f2e22,#14573f)}
+.info-avg{background:linear-gradient(135deg,#0f2e22,#14573f)!important}
+.info-avg .value{color:#86efac}
+#aiChatHeader{background:linear-gradient(135deg,#0f2e22,#14573f)}
+.simtb tbody tr:hover td{background:#edf6f0}
+
+/* progress peserta simulasi */
+.pbar{height:8px;min-width:70px;border-radius:99px;background:#e8eee9;overflow:hidden}
+.pbar i{display:block;height:100%;border-radius:99px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.pbar .b-ok{background:#22a06b}.pbar .b-warn{background:#e0a526}.pbar .b-bad{background:#e5484d}
+.pn{display:block;margin-top:4px;font-size:11px;font-weight:700;color:var(--mute)}
+
+/* tombol email */
+.cta{display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:14px 28px;border-radius:99px;background:linear-gradient(135deg,#0f2e22,#1f7a56);color:#fff!important;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 10px 24px rgba(15,46,34,.25);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.cta:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(15,46,34,.3)}
+.cta:active{transform:scale(.98)}
+.cta svg{width:18px;height:18px}
+
+/* halaman inovasi: palet per aplikasi (tanpa ungu) */
+.ap-bi{--a:#14573f;--b:#3fa877;--c:#c8a24a;--k:#0b2a1f;--t:#eef6f1}
+.ap-mata{--a:#3d5a1e;--b:#9db53e;--c:#c8a24a;--k:#16280d;--t:#f1f5e4}
+.ap-si{--a:#0f3d2e;--b:#4aa883;--c:#c8a24a;--k:#0b2a1f;--t:#edf5f0}
+.sec.ap{background:radial-gradient(900px 520px at 85% 0,var(--t),transparent 65%),radial-gradient(700px 420px at 0 100%,var(--t),transparent 60%),#fff;animation:none}
+.ap .blob{display:none}
+.ap .col{animation:colIn .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes colIn{from{opacity:0;transform:translateY(18px)}}
+.ap h2.big{background:linear-gradient(180deg,var(--k),var(--a));-webkit-background-clip:text;background-clip:text;color:transparent;animation:none;letter-spacing:-.045em}
+.ap-tag{background:#fff;color:var(--a);border:1px solid rgba(15,61,46,.14);box-shadow:0 2px 8px rgba(15,46,34,.06)}
+.chips2 span,.chips2 span:nth-child(2n),.chips2 span:nth-child(3n){background:#fff;color:var(--a);border:1px solid rgba(15,61,46,.12);box-shadow:0 1px 3px rgba(15,46,34,.05);animation:none;font-weight:600}
+
+/* mockup perangkat: statis & elegan, transisi layar halus */
+.pf{background:#0c1a14;border-radius:44px;padding:9px;box-shadow:inset 0 0 0 1.5px #2b3a32,0 40px 80px -20px rgba(15,46,34,.45),0 12px 24px -12px rgba(15,46,34,.3);animation:none}
+.lap .pf{border-radius:18px}
+.scs{border-radius:36px;background:#f7faf8}
+.lap .scs{border-radius:9px}
+.sc{transform:translateY(10px) scale(.985);transition:opacity .7s cubic-bezier(.2,.8,.2,1),transform .7s cubic-bezier(.2,.8,.2,1)}
+.sc.on{transform:none}
+.st{background:linear-gradient(160deg,var(--k),var(--a));animation:none}
+@keyframes sri{from{opacity:0;transform:translateY(8px)}}
+.btn{animation:none}
+.sx,.sr{box-shadow:0 1px 2px rgba(15,46,34,.06)}
+.dts button{width:7px;height:7px}
+.dts button.on{width:24px;background:var(--a)}
+
+/* kartu fitur: bento putih bersih */
+.fgrid{height:min(58dvh,560px)}
+.fc{background:rgba(255,255,255,.82);border:1px solid rgba(15,61,46,.08);border-radius:28px;box-shadow:0 1px 2px rgba(15,46,34,.04),0 16px 40px -16px rgba(15,46,34,.18);transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.fc::before,.fc i::after{display:none}
+.fc i{width:clamp(52px,9vw,76px);height:clamp(52px,9vw,76px);border-radius:22px;background:linear-gradient(160deg,#fff,var(--t));border:1px solid rgba(15,61,46,.08);box-shadow:0 8px 20px -8px rgba(15,46,34,.25);color:var(--a);animation:none}
+.fc i .ai{width:52%;height:52%}
+.fc b{font-weight:700;letter-spacing:-.01em}
+.fc:hover,.fc:focus-visible{transform:translateY(-6px);box-shadow:0 2px 4px rgba(15,46,34,.05),0 28px 56px -18px rgba(15,46,34,.28)}
+.fc:active{transform:scale(.98)}
+.apc .ic2{background:linear-gradient(160deg,#fff,var(--t));color:var(--a);border:1px solid rgba(15,61,46,.08)}
+.apc .ic2 .ai{width:30px;height:30px}
+
+/* ikon SVG beranimasi halus */
+.ai{display:block;overflow:visible}
+.ai *{transform-box:fill-box;transform-origin:center}
+.ai .f{fill:var(--b);stroke:none}
+.ai .s{stroke:var(--b)}
+.ai .a-pulse{animation:aiPulse 2.6s ease-in-out infinite}
+.ai .a-blink{animation:aiBlink 2s ease-in-out infinite}
+.ai .a-draw{stroke-dasharray:40;animation:aiDraw 3.2s ease-in-out infinite}
+.ai .a-rise{transform-origin:50% 100%;animation:aiRise 2.8s ease-in-out infinite}
+.ai .a-float{animation:aiFloat 3s ease-in-out infinite}
+.ai .a-spin{animation:aiSpin 10s linear infinite}
+@keyframes aiPulse{0%,100%{opacity:.4;transform:scale(.88)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes aiBlink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes aiDraw{0%{stroke-dashoffset:40}50%,100%{stroke-dashoffset:0}}
+@keyframes aiRise{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+@keyframes aiFloat{50%{transform:translateY(-1.5px)}}
+@keyframes aiSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.ai *,.ap .col{animation:none!important}}
+
+/* anti kepotong: tiap section muat dalam 1 layar */
+.sec{padding:clamp(14px,3.2vh,36px) clamp(16px,5vw,80px)}
+.sec h2{font-size:clamp(26px,4vw,46px)}
+.pic{max-height:min(52dvh,460px)}
+.chartbox{height:min(46dvh,420px)}
+.ratio{max-width:min(960px,calc((100dvh - 230px)*1.7778))}
+.lap .pf{width:min(560px,92vw,calc(54dvh*1.6))}
+@media(min-width:901px) and (max-height:740px){.pcar .pf{zoom:.86}}
+@media(min-width:901px) and (max-height:640px){.pcar .pf{zoom:.72}}
+
+/* ================================================================
+   v3: font modern, fitur gaya eForm MATA SMART, halaman update
+   ================================================================ */
+:root{--font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;--fh:'Sora','Inter',system-ui,sans-serif}
+body{font-feature-settings:'cv11','ss01'}
+h1,h2,h3,.boiler-title,.stat b,.ctr b,.sx b,.info-card .value,.head h1,.hero h2,.ap h2.big{font-family:var(--fh)}
+.boiler-title,.hero h2,.sec h2,.head h1,.ap h2.big{font-weight:700;letter-spacing:-.035em}
+.stat b,.ctr b{font-weight:700}
+
+/* tabel: sel gabungan rapi */
+td[rowspan]{vertical-align:middle;border-right:1px solid #f0f1f4}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+
+/* fitur: ikon besar, transparan, tanpa kartu (gaya menu eForm MATA SMART) */
+.fgrid{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:clamp(18px,4vh,44px) clamp(8px,2vw,28px);width:100%;max-width:1040px;height:auto;margin:6px auto 0}
+.fc{--isz:clamp(84px,min(14vw,21dvh),150px);flex:0 0 calc(25% - 24px);min-width:0;background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:0;padding:0;gap:clamp(8px,1.6vh,16px);font:inherit;color:inherit;cursor:pointer;overflow:visible}
+.ap-si .fc{flex-basis:calc(33.333% - 24px)}
+.fc:hover,.fc:focus-visible{transform:none;box-shadow:none}
+.fc:focus-visible{outline-offset:6px;border-radius:16px}
+.fc i{width:var(--isz);height:var(--isz);border-radius:0;background:none;border:0;box-shadow:none;padding:0;color:var(--a);animation:none;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.fc i .ai{width:100%;height:100%;stroke-width:.85;animation:aiBreath 5s ease-in-out infinite}
+.fc:nth-child(odd) i .ai{animation-delay:-2.5s}
+.fc:hover i{transform:translateY(-6px) scale(1.04)}
+.fc:active i{transform:scale(.94)}
+.fc b{font-size:clamp(13px,1.45vw,17px);font-weight:700;color:var(--k);letter-spacing:-.01em}
+.fc b::after{content:' ›';opacity:0;transition:opacity .3s}
+.fc:hover b::after{opacity:1}
+.ai .a-roll{animation:aiRoll 2.4s ease-in-out infinite}
+@keyframes aiRoll{0%{transform:translateY(-3px);opacity:0}25%,65%{transform:translateY(0);opacity:1}100%{transform:translateY(3px);opacity:0}}
+@keyframes aiBreath{50%{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.fc i .ai{animation:none!important}}
+@media(max-width:700px){
+  .fc,.ap-si .fc{flex-basis:calc(33.333% - 12px);--isz:clamp(64px,22vw,110px)}
+  .fgrid{gap:22px 8px}
+}
+
+/* halaman update simulasi */
+.su{max-width:760px}
+.su-card{padding:26px;display:flex;flex-direction:column;gap:10px}
+.su label,.su-card label{display:block;margin-top:8px;font-size:12px;font-weight:700;color:var(--mute)}
+.su input[type=text],.su input[type=email],.su input[type=password]{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:14px;font-size:16px;background:#fff}
+.su-q{background:rgba(255,255,255,.76);border:1px solid var(--line);border-radius:22px;padding:18px 18px 20px;margin-bottom:14px;box-shadow:0 1px 2px rgba(15,46,34,.04)}
+.su-q h4{margin:0 0 12px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px}
+.su-q h4 small{font-weight:500;color:var(--mute)}
+.su-n{display:inline-grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--ac2);color:#fff;font-size:12px;font-weight:700}
+.su-hint{margin:8px 0 0;font-size:12.5px;color:var(--mute)}
+.su-q .su-hint:first-of-type{margin-top:-4px;margin-bottom:10px}
+.su-seg{display:inline-flex;padding:4px;border-radius:99px;background:#e6f1ea}
+.su-seg button{border:0;background:none;padding:9px 22px;border-radius:99px;font:700 14px var(--font);color:var(--ac2);cursor:pointer;transition:all .25s}
+.su-seg button.on{background:#fff;box-shadow:0 2px 8px rgba(15,46,34,.15)}
+.su-chips{display:flex;flex-wrap:wrap;gap:8px}
+.su-chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:9px 14px;font:600 13px var(--font);color:var(--ink);cursor:pointer;transition:all .25s;text-align:left}
+.su-chip:hover{border-color:var(--ac)}
+.su-chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.su-chip.on::before{content:'✓ '}
+.su-link{border:0;background:none;padding:0;font:700 13px var(--font);color:var(--ac2);cursor:pointer;text-decoration:underline}
+.su-who{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--mute)}
+.su-msg{padding:12px 14px;border-radius:14px;font-size:13.5px;font-weight:600;margin:6px 0}
+.su-msg.err{background:#fee2e2;color:#b91c1c}
+.su-msg.ok{background:#dcfce7;color:#15803d}
+.su-save{width:100%;padding:15px;font-size:15px}
+.su-save:disabled{opacity:.6}
+
+/* ================================================================
+   MOBILE: portrait & landscape
+   ================================================================ */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.tablecard{-webkit-overflow-scrolling:touch}
+.tablecard table{min-width:460px}
+.tablecard .simtb{min-width:640px}
+table:has(#detailHeatlossBody),table:has(#detailRiksaBody){min-width:780px}
+
+@media(max-width:900px){
+  input,select,textarea{font-size:16px!important}  /* cegah auto-zoom iOS */
+}
+@media(max-width:760px){
+  #aiChatWidget{left:10px;right:10px;width:auto;min-width:0}
+}
+
+/* HP landscape (layar pendek) */
+@media(max-height:520px){
+  .header{height:50px}
+  .header-left img{width:26px}.header-left h1{font-size:14px}
+  .body{overflow-y:auto;padding-top:12px;padding-bottom:16px;gap:12px}
+  .split,.as-main{flex:none}
+  .head h1{font-size:22px}.head p{font-size:13px}
+  .ringcard{padding:14px;gap:12px}
+  .ring{width:min(100%,150px)}.ctr b{font-size:30px}
+  .tablecard{max-height:none}
+  .chart-wrap{min-height:260px}
+  .sec,.sec.ap.v{min-height:auto}
+  .sec:not(.lap) .pcar .pf{zoom:.6}
+  .dropdown-content{max-height:calc(100dvh - 70px);overflow:auto}
+  #chatFAB{width:52px;height:52px;bottom:10px;right:max(12px,calc(env(safe-area-inset-right) + 8px))}
+  #minBoiIcon{width:70px;height:70px;top:-8px}
+  #aiChatWidget{left:auto;bottom:10px;right:78px;width:min(340px,calc(100vw - 100px));height:calc(100dvh - 20px);min-height:0;max-height:calc(100dvh - 20px)}
+  #btnAssessmentAction{bottom:12px;right:78px;padding:9px 16px}
+}
+@media(max-height:520px) and (min-width:901px){
+  .split{grid-template-columns:minmax(200px,240px) minmax(0,1fr)}
+}
+
+</style>
 </head>
 <body>
-<script>const API='https://script.google.com/macros/s/AKfycbybfpMt7eKUufiLwjweqS_rIUGn4h6x26hjU66xztrwe5KBMXodrO64aFR9Wrfuqpd52A/exec';</script>
 
-<div id="app"></div>
-<div id="ov" class="hidden fixed inset-0 z-[60] bg-zinc-950"></div>
-<div id="modal" class="hidden fixed inset-0 z-[70] bg-black/80 flex items-center justify-center p-4"><div id="mbox" class="c w-full max-w-md p-6 space-y-3 max-h-[90vh] overflow-y-auto"></div></div>
-<div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] bg-white text-black text-sm font-semibold px-5 py-2.5 rounded-full shadow-xl"></div>
+<div id="welcomePage" class="page welcome active">
+  <div class="welcome-header" onclick="goToWelcome()"><img src="https://lh3.googleusercontent.com/d/1CwBi7j323RQBIhBoSBpREdp4qNuREx6F=w200" alt="Logo"><span>Service &amp; Inspection</span></div>
+  <div class="boiler-hero"><h1 class="boiler-title">Boiler Inspection</h1><p class="boiler-sub">Service &amp; Inspection Departemen</p></div>
+  <button class="burger" onclick="toggleMenu(this)" aria-label="Menu">☰</button>
+  <div class="button-group" data-nav=""></div>
+</div>
+
+<div id="pages"></div>
+
+<!-- PROFILE -->
+<div id="profilePage" class="page">
+  <div class="header" data-nav="profile"></div>
+  <div class="scroll">
+    <div class="hero">
+      <div>
+        <h2>Boiler Inspection</h2>
+        <p>Tim Boiler Inspection memastikan keandalan dan efisiensi operasional boiler pabrik kelapa sawit. Lewat inspeksi rutin, tim mengidentifikasi potensi kerusakan sejak dini untuk mencegah unscheduled breakdown, mengurangi downtime, dan menjaga efisiensi energi pabrik. Tim juga mendukung proyek, boiler erection, perbaikan, pelatihan, dan asesmen kompetensi staf.</p>
+        <p>Selain inspeksi dan dukungan teknis, tim menjalankan monitoring real-time kondisi dan reliabilitas boiler, termasuk Heatloss Monitoring. Dengan teknologi digital dan pendekatan berbasis data, kami terus berinovasi menuju operasional yang efisien, transparan, dan zero downtime.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>5</b><span>Anggota tim</span></div>
+        <div class="stat"><b>AK3</b><span>PUBT tersertifikasi</span></div>
+        <div class="stat"><b>NDT</b><span>MT · PT · UT · RI</span></div>
+        <div class="stat"><b>0</b><span>Target downtime</span></div>
+      </div>
+    </div>
+    <div class="cwrap">
+      <button class="arr l" onclick="slide(-1)" aria-label="Sebelumnya">‹</button>
+      <div class="track" id="people"></div>
+      <div class="dots" id="pdots"></div>
+      <button class="arr r" onclick="slide(1)" aria-label="Berikutnya">›</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOILER EFFICIENCY -->
+<div id="boilerEfficiencyPage" class="page">
+  <div class="header" data-nav="innovation"></div>
+  <div class="scroll snap">
+    <section class="sec">
+      <div class="col" style="text-align:center"><img id="beImage" class="pic" src="https://lh3.googleusercontent.com/d/1_1UkeJUJk_YAvrn39jQERA5DhIeTTY0k=w400" alt="Boiler Efficiency"></div>
+      <div class="col"><h2>Boiler Efficiency</h2>
+        <p>Optimalisasi pembakaran boiler untuk menurunkan konsumsi bahan bakar dengan mengatur kadar oksigen udara pembakaran sampai titik optimal. Pabrik menghemat cangkang (shell), kinerja boiler naik, dan biaya energi turun.</p>
+        <p class="hint">Scroll untuk melihat dashboard dan video</p></div>
+    </section>
+    <section class="sec v"><h2>Excess Shell</h2><div class="chartbox card"><canvas id="beChart"></canvas></div><p id="beFetchStatus" class="hint">Loading...</p></section>
+    <section class="sec v"><h2>Video Demonstrasi</h2><div class="ratio"><iframe src="https://drive.google.com/file/d/1CVQOOoGfiVWy83Cq94rrC7dcOB1zD48D/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe></div></section>
+  </div>
+</div>
+
+<!-- SISTEM LAPOR -->
+<div id="sistemLaporPage" class="page">
+  <div class="header" data-nav="innovation"></div>
+  <div class="scroll snap">
+    <section class="sec">
+      <div class="col" style="text-align:center"><img class="pic" src="https://lh3.googleusercontent.com/d/1YuGdp28Dw4XSxe4zjwptJJgtZRUWfHLR=w1000" alt="Sistem Lapor"></div>
+      <div class="col"><h2>Sistem Lapor!!!</h2>
+        <p>Platform pelaporan terintegrasi untuk temuan inspeksi, kerusakan, dan kebutuhan perbaikan. Langkah digitalisasi agar setiap masalah teratasi efisien, dari deteksi sampai tindak lanjut.</p>
+        <p class="hint">Scroll untuk melihat presentasi, video panduan, dan kontak</p></div>
+    </section>
+    <section class="sec v"><div class="ratio"><iframe src="https://www.canva.com/design/DAGuv-C02PM/Tq8QnYhn8UoycqXhrTBqHw/view?embed" loading="lazy" allowfullscreen></iframe></div></section>
+    <section class="sec v"><h2>Video Panduan</h2><div class="ratio"><iframe src="https://drive.google.com/file/d/1UT5CvD_5ZB9GwVa46wDHQbjuesAwGcEE/preview" allow="autoplay; encrypted-media" allowfullscreen></iframe></div></section>
+    <section class="sec v"><div class="contact-box card"><h2>Hubungi Kami</h2><p>Untuk pertanyaan atau bantuan, hubungi:</p><a class="cta" href="mailto:uchfedy@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>Hubungi via Email</a></div></section>
+  </div>
+</div>
+
+<!-- ASSESSMENT -->
+<div id="assessmentPage" class="page">
+  <div class="header" data-nav="monitoring"></div>
+  <div class="body">
+    <div class="head"><h1>Assessment SOP &amp; IK Boiler</h1><p>Hasil assessment per periode, PSM, dan pabrik.</p></div>
+    <div class="as-main">
+      <div>
+        <div class="slicer"><select id="filterGar" class="filter-select"></select><select id="filterPsm" class="filter-select"></select><select id="filterPabrik" class="filter-select"></select></div>
+        <div class="chart-wrap card"><canvas id="assessmentChart"></canvas></div>
+      </div>
+      <div>
+        <div class="info-card info-avg card"><div class="label">Nilai rata-rata</div><div class="value" id="avgBox">-</div></div>
+        <div class="info-grid">
+          <div class="info-card card"><div class="label">PSM terbaik</div><div class="value" id="bestPsm">-</div></div>
+          <div class="info-card card"><div class="label">Pabrik terbaik</div><div class="value" id="bestPabrik">-</div></div>
+          <div class="info-card card"><div class="label">PSM teraktif</div><div class="value" id="aktifPsm">-</div></div>
+          <div class="info-card card"><div class="label">Pabrik teraktif</div><div class="value" id="aktifPabrik">-</div></div>
+        </div>
+        <div class="missing-box card"><h4>Pabrik belum melakukan assessment</h4><ol id="missingList" class="missing-list"><li>—</li></ol></div>
+      </div>
+    </div>
+  </div>
+  <button id="btnAssessmentAction" onclick="window.open('https://azukha-dev.github.io/Boiler-learning-center/','_blank')">🚀 Learning Center</button>
+</div>
+
+<!-- SUMMARY -->
+<div id="summaryPage" class="page">
+  <div class="header" data-nav="back"></div>
+  <div class="body">
+    <div class="head"><h1 id="summaryTitle">Summary Data</h1></div>
+    <div class="sum" id="sumGrid"></div>
+  </div>
+</div>
+
+<!-- UPDATE SIMULASI (login + pertanyaan) -->
+<div id="simulasiUpdatePage" class="page">
+  <div class="header" data-nav="back"></div>
+  <div class="scroll">
+   <div class="body su">
+    <div class="head"><h1>Update Simulasi Darurat</h1><p id="suSub">Masuk terlebih dahulu untuk memperbarui data simulasi.</p></div>
+
+    <div id="suLoginCard" class="card su-card">
+      <h3 style="margin:0;font-size:20px">Masuk</h3>
+      <label for="suUser">Username</label><input id="suUser" type="text" placeholder="Masukkan Username" autocomplete="username">
+      <label for="suEmail">Email terdaftar</label><input id="suEmail" type="email" placeholder="Email terdaftar" autocomplete="email">
+      <label for="suPass">Password</label><input id="suPass" type="password" placeholder="Masukkan Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')suDoLogin()">
+      <div id="suLoginMsg" class="su-msg" style="display:none"></div>
+      <button id="suLoginBtn" class="save-btn" onclick="suDoLogin()">Masuk</button>
+    </div>
+
+    <div id="suForm" style="display:none">
+      <div class="su-who"><span id="suWho"></span><button type="button" class="su-link" onclick="suLogout()">Keluar</button></div>
+
+      <div class="su-q"><h4><span class="su-n">1</span>Pabrik mana yang melakukan simulasi?</h4>
+        <select id="suPabrik" class="filter-select" onchange="suHint();suLog()"></select></div>
+
+      <div class="su-q"><h4><span class="su-n">2</span>Simulasi dilakukan di shift berapa?</h4>
+        <div class="su-seg"><button type="button" class="on" onclick="suShift('1',this)">Shift 1</button><button type="button" onclick="suShift('2',this)">Shift 2</button></div>
+        <p id="suHint" class="su-hint"></p></div>
+
+      <div class="su-q"><h4><span class="su-n">3</span>Kapan simulasi dilaksanakan?</h4>
+        <input type="date" id="suTgl"></div>
+
+      <div class="su-q"><h4><span class="su-n">4</span>Kondisi darurat apa saja yang disimulasikan?</h4>
+        <p class="su-hint">Pilih satu atau lebih.</p><div class="su-chips" id="suKondisi"></div></div>
+
+      <div class="su-q"><h4><span class="su-n">5</span>Siapa saja yang ikut simulasi?</h4>
+        <p class="su-hint"><button type="button" class="su-link" onclick="suAll()">Pilih semua / hapus semua</button></p><div class="su-chips" id="suPeserta"></div></div>
+
+      <div class="su-q"><h4><span class="su-n">6</span>Dokumentasi <small>(opsional)</small></h4>
+        <label>Foto dokumentasi (maks 3 foto, 4 MB per foto)</label><input type="file" id="suFoto" accept="image/*" multiple>
+        <label>Berita Acara bertanda tangan (PDF, maks 10 MB)</label><input type="file" id="suBA" accept=".pdf"></div>
+
+      <div id="suMsg" class="su-msg" style="display:none"></div>
+      <button type="button" id="suSave" class="save-btn su-save" onclick="suSubmit(this)">Save Update Simulasi</button>
+
+      <h3 style="margin:24px 0 8px">Riwayat Update</h3>
+      <div class="tablecard card"><table><thead><tr><th>No.</th><th>Timestamp</th><th>Uploader</th><th>Tanggal Simulasi</th><th>File</th></tr></thead><tbody id="suLogBody"></tbody></table></div>
+    </div>
+   </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="uploaderLoginModal">
+  <div class="login-box">
+    <h3>Login Uploader</h3>
+    <label for="loginUsername">Username</label><input id="loginUsername" placeholder="Masukkan Username" autocomplete="username">
+    <label for="loginEmail">Email terdaftar</label><input id="loginEmail" type="email" placeholder="Email terdaftar" autocomplete="email">
+    <label for="loginPassword">Password</label><input id="loginPassword" type="password" placeholder="Masukkan Password" autocomplete="current-password">
+    <div id="loginMsg"></div>
+    <div class="login-actions"><button class="btn-cancel" onclick="closeUploaderLogin()">Batal</button><button id="uploaderLoginButton" onclick="doUploaderLogin()">Login</button></div>
+  </div>
+</div>
+
+<!-- MINBOI -->
+<div id="chatFAB" title="Tanya MinBoi"><img id="minBoiIcon" src="https://lh3.googleusercontent.com/d/1BH5LUHeflPcWZDHBu7vlCERdJNyqoaD7" alt="MinBoi"></div>
+<div id="aiChatWidget">
+  <div id="aiChatHeader"><span>Tanya Boiler Inspection</span><button id="closeChatBtn">×</button></div>
+  <div id="aiChatBody"><div id="aiMessages"><div class="msg bot">Halo! Saya MinBoi / Admin Boiler Inspection. Silakan ajukan pertanyaan terkait SOP / IK Boiler.</div></div></div>
+  <div id="aiChatInput"><input id="aiUserInput" type="text" placeholder="Tanyakan tentang SOP"><button id="aiSendBtn">Kirim</button></div>
+</div>
 
 <script>
-const $=s=>document.querySelector(s);
-const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const SPORT={padel:'Padel',badminton:'Bulu Tangkis',tennis:'Tenis',all:'Multi'};
-let U=null;try{U=JSON.parse(localStorage.getItem('sahata_user'))}catch(e){}
-let S={events:[],matches:[],users:[]},tab='board',sport='all',liveId=null,lastAct=0,evId=null,ED=null,ovId=null;
-
-function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.remove('hidden');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.add('hidden'),ms||2500)}
-function modal(h){$('#mbox').innerHTML=h;$('#modal').classList.remove('hidden')}
-function closeM(){$('#modal').classList.add('hidden')}
-async function call(a,d={}){
-  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({a,uid:U&&U.id,...d})});return await r.json()}
-  catch(e){return{ok:false,error:'Gagal terhubung ke server'}}
-}
-async function srv(a,d,msg){const r=await call(a,d);toast(r.ok?(msg||'Tersimpan'):r.error);lastAct=0;load();return r}
-let pushing=0,lv=0;const pq=new Set();
-async function load(){
-  if(!U||pushing||Date.now()-lastAct<4000||!$('#modal').classList.contains('hidden'))return;
-  let r;const v0=lv;
-  try{r=await (await fetch(API)).json()}
-  catch(e){toast('Gagal memuat data dari server',4000);return}
-  if(pushing||v0!=lv||Date.now()-lastAct<4000)return; // data lama, ada perubahan lokal saat mengambil
-  if(!r||r.ok===false||!Array.isArray(r.events)){toast('Server: '+((r&&r.error)||'format data salah. Deploy ulang Code.gs'),6000);return}
-  S={events:r.events,matches:(r.matches||[]).filter(m=>!(m.teamA=='Tim A'&&m.status=='upcoming')),users:Array.isArray(r.users)?r.users:[]};
-  if(!load.shown){load.shown=1;toast('Server mengirim '+S.users.length+' pengguna, '+S.events.length+' event',5000)}
-  try{
-    const a=document.activeElement;
-    if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)&&$('#v')&&$('#v').contains(a)){renderOv();return}
-    view();
-  }catch(e){console.error(e);toast('Error tampilan: '+e.message,6000)}
-}
-(function poll(){load();setTimeout(poll,(tab==='live'||ovId)?3000:15000)})();
-
-// ---------- HELPERS ----------
-const jp=j=>{try{return JSON.parse(j)||[]}catch(e){return[]}};
-const rid=()=>Math.random().toString(36).slice(2,8);
-function sgHtml(e,q){q=String(q).split(',').pop().trim().toLowerCase();const ps=P(e),L=S.users.filter(u=>!ps.some(p=>p.u==u.id)&&(!q||u.name.toLowerCase().includes(q))).slice(0,14);
-  return L.map(u=>`<button class="g !py-1 !px-3 !text-xs" onclick="pickU('${e.id}','${u.id}')">+ ${esc(u.name)}</button>`).join('')||'<span class="text-xs text-zinc-500">Tidak ada saran. Ketik nama lalu tekan Daftarkan untuk menambah sebagai Guest.</span>'}
-function opt(a,d,mut,msg){
-  mut();lastAct=Date.now();view();toast(msg);
-  call(a,d).then(r=>{if(!r.ok){toast(r.error,4000);lastAct=0;load()}else lastAct=Date.now()-2500});
-}
-function pickU(id,uid){const e=S.events.find(x=>x.id==id),u=S.users.find(x=>x.id==uid);if(!e||!u||P(e).some(p=>p.u==uid))return;
-  const it={id:rid(),n:u.name,u:u.id};
-  opt('addPlayers',{id,list:JSON.stringify([it])},()=>{e.players=JSON.stringify(P(e).concat([it]))},u.name+' didaftarkan')}
-const fn=n=>String(n).trim().split(/\s+/)[0];
-const tn=(m,c)=>(c&&c.trim())||m.map(x=>fn(x.n)).join(' & ');
-function fd(s){s=String(s||'');if(/^\d{4}-\d{2}-\d{2}$/.test(s))return new Date(s+'T00:00').toDateString();const d=new Date(s);if(isNaN(d))return s;const t=d.toTimeString().slice(0,5);return d.toDateString()+(t=='00:00'?'':' · '+t)}
-function toLocalInput(s){s=String(s||'');if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(s))return s.slice(0,16);let d=/^\d{4}-\d{2}-\d{2}$/.test(s)?new Date(s+'T00:00'):new Date(s);if(isNaN(d))d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
-function fs(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen().catch(()=>{})}
-
-// ---------- AUTH (email saja) ----------
-function authView(){
-  $('#app').innerHTML=`<div class="min-h-screen flex items-center justify-center p-5"><div class="c w-full max-w-sm p-7 space-y-5">
-  <div class="text-center space-y-1"><img src="logo.png" alt="SAHATA" class="w-44 mx-auto rounded-2xl bg-[#faf8ec] p-2">
-  <p class="text-zinc-400 text-sm">Sport Ultimate Ranking & Events</p></div>
-  <input id="ae" type="email" class="i" placeholder="Email" autocomplete="email" onkeydown="if(event.key=='Enter')doAuth()">
-  <button id="ab" onclick="doAuth()" class="b w-full">Masuk</button>
-  <p class="text-xs text-zinc-500 text-center">Cukup email. Kalau belum terdaftar, akun dibuat otomatis.</p></div></div>`;
-}
-async function doAuth(){
-  const email=$('#ae').value.trim();
-  if(!email)return toast('Email wajib diisi');
-  $('#ab').textContent='Memproses...';
-  const r=await call('login',{email});
-  if(!r.ok){toast(r.error);$('#ab').textContent='Masuk';return}
-  U=r.user;localStorage.setItem('sahata_user',JSON.stringify(U));boot();
-}
-function logout(){localStorage.removeItem('sahata_user');U=null;closeOv();boot()}
-
-// ---------- SHELL ----------
-function boot(){
-  if(!U)return authView();
-  const T=[['board','🏆','Leaderboard'],['events','📅','Event'],['live','🔴','Live'],['players','👥','Atlet'],['me','🪪','Profile']];
-  $('#app').innerHTML=`<header class="sticky top-0 z-40 bg-black/90 backdrop-blur border-b border-zinc-800 px-4 h-14 flex items-center justify-between">
-   <img src="logo.png" alt="SAHATA" class="h-10 w-auto rounded-lg bg-[#faf8ec] p-0.5">
-   <span class="text-xs text-zinc-300 bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1">● ${esc(U.name)}</span></header>
-   <nav class="bg-zinc-950 border-b border-zinc-800 flex overflow-x-auto sticky top-14 z-30">${T.map(t=>`<button id="t-${t[0]}" onclick="go('${t[0]}')" class="px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2"></button>`).join('')}</nav>
-   <main id="v" class="max-w-6xl mx-auto p-4 space-y-4"></main>`;
-  T.forEach(t=>$('#t-'+t[0]).innerHTML=`<span class="e">${t[1]}</span><span>${t[2]}</span>`);go(tab);load();
-}
-function go(t){tab=t;document.querySelectorAll('nav button').forEach(b=>b.className='flex flex-col sm:flex-row items-center sm:gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 '+(b.id=='t-'+t?'border-white text-white':'border-transparent text-zinc-400'));view()}
-function view(){if(!U||!$('#v'))return;({board,events,live,players,me})[tab]();renderOv()}
-
-// ---------- LEADERBOARD ----------
-const gOf=s=>(s.sh||[]).reduce((a,x)=>[a[0]+(+x[0]||0),a[1]+(+x[1]||0)],[s.g?+s.g[0]:0,s.g?+s.g[1]:0]);
-function rank(sp){
-  const T={};S.users.forEach(u=>T[u.id]={id:u.id,name:u.name,m:0,w:0,d:0,l:0,pt:0,gd:0});
-  S.matches.filter(m=>m.status=='done'&&(sp=='all'||m.sport==sp)).forEach(m=>{const s=ST(m);if(!s)return;
-    const x=m.sport=='badminton'?s.p:gOf(s);
-    [[0,m.memA],[1,m.memB]].forEach(([t,j])=>jp(j).forEach(y=>{const o=y.u&&T[y.u];if(!o)return;
-      o.m++;o.gd+=(x[t]||0)-(x[1-t]||0);
-      if(s.w<0){o.d++;o.pt++}else if(s.w==t){o.w++;o.pt+=3}else o.l++}))});
-  const L=Object.values(T);
-  L.forEach(o=>{o.wr=o.m?(o.w+o.d/2)/o.m:0;o.sc=(o.w+o.d/2+1.5)/(o.m+3)});
-  const pl=(a,b)=>(b.m>0)-(a.m>0);
-  return sp=='all'
-    ?L.sort((a,b)=>pl(a,b)||b.sc-a.sc||b.m-a.m||a.name.localeCompare(b.name))
-    :L.sort((a,b)=>pl(a,b)||b.pt-a.pt||b.gd-a.gd||b.w-a.w||a.name.localeCompare(b.name))}
-function board(){
-  const L=rank(sport),all=sport=='all',pd=sport=='padel',sd=all||pd;
-  const info=all?'Urut: Menang % (disesuaikan jumlah main)'
-    :pd?'M 3 · S 1 · K 0 · Pembeda: selisih game'
-    :sport=='tennis'?'M 3 · K 0 · Pembeda: selisih game'
-    :'M 3 · K 0 · Pembeda: selisih poin';
-  const tabs=[['all','Semua'],['padel','Padel'],['tennis','Tenis'],['badminton','Bulu Tangkis']];
-  $('#v').innerHTML=`<div class="c p-6 bg-gradient-to-r from-zinc-900 to-black"><h1 class="text-2xl sm:text-4xl font-black uppercase">Leaderboard SAHATA</h1></div>
-  <div class="flex gap-2 overflow-x-auto">${tabs.map(t=>`<button onclick="sport='${t[0]}';board()" class="${sport==t[0]?'bg-white text-black':'bg-zinc-900 border border-zinc-800 text-zinc-300'} px-4 py-2 rounded-lg text-xs font-bold uppercase whitespace-nowrap">${t[1]}</button>`).join('')}</div><div class="text-[11px] text-zinc-500 text-right -mb-2">${info}</div>
-  <div class="c overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs text-zinc-400 uppercase bg-zinc-900/50"><tr>
-  <th class="p-3 text-center">#</th><th class="p-3">Atlet</th><th class="p-3 text-center">Main</th><th class="p-3 text-center">Menang</th>${sd?'<th class="p-3 text-center">Seri</th>':''}<th class="p-3 text-center">Kalah</th>${all?'<th class="p-3 text-right">Menang %</th>':'<th class="p-3 text-center">+/-</th><th class="p-3 text-right">Poin</th>'}</tr></thead><tbody class="divide-y divide-zinc-900">
-  ${L.map((p,i)=>{const top=i==0&&p.m>0;return`<tr class="${p.m?'':'opacity-50'}"><td class="p-3 text-center font-black ${top?'text-amber-400':'text-zinc-400'}">${top?'👑':i+1}</td>
-  <td class="p-3 font-bold">${esc(p.name)}</td><td class="p-3 text-center">${p.m}</td><td class="p-3 text-center text-emerald-400 font-bold">${p.w}</td>${sd?`<td class="p-3 text-center">${p.d}</td>`:''}<td class="p-3 text-center text-red-400 font-bold">${p.l}</td>
-  ${all?`<td class="p-3 text-right font-black">${p.m?Math.round(p.wr*100)+'%':'-'}</td>`:`<td class="p-3 text-center">${p.gd>0?'+':''}${p.gd}</td><td class="p-3 text-right font-black">${p.pt}</td>`}</tr>`}).join('')||`<tr><td colspan=8 class="p-8 text-center text-zinc-500">Belum ada atlet</td></tr>`}</tbody></table></div>`;
-}
-
-// ---------- RULES & SKORING ----------
-const R=m=>{try{return JSON.parse(m.rule)}catch(e){return{t:m.sport}}};
-const ST=m=>{try{return JSON.parse(m.st)}catch(e){return null}};
-const isFix=r=>r.t=='padel'&&r.fmt&&r.fmt!='single'&&r.partner=='fix';
-const hasSets=r=>r.t=='tennis'||(r.t=='padel'&&+r.sets>0); // tenis & padel mode set
-const P=e=>jp(e.players).map(x=>typeof x=='string'?{id:x,n:x,u:''}:x);
-const TM=e=>jp(e.teams);
-const FMT={single:'Pertandingan bebas',americano:'Americano',mexicano:'Mexicano'};
-const fresh=()=>({p:[0,0],g:[0,0],s:[0,0],sh:[],tb:0,d:0,w:-1});
-const snap=s=>{const c=JSON.parse(JSON.stringify(s));delete c.h;delete c.prev;return c};
-function rl(r){
-  if(r.t=='padel'){const sc=+r.sets>0?(r.sets==1?'1 set':'Best of '+r.sets+' set')+' + tie-break':r.n+' game';
-    return `Padel · ${FMT[r.fmt||'single']}${r.fmt&&r.fmt!='single'?(r.partner=='fix'?' · Fix Partner':' · Mix Partner'):''} · ${sc} · ${r.golden?'Golden point':'Advantage'}`}
-  return r.t=='tennis'?(r.sets==1?'Tenis · 1 set (6 game)':`Tenis · Best of ${r.sets} set`):'Bulu Tangkis · langsung 21'}
-function setWin(r,s,t){s.sh=(s.sh||[]).concat([[s.g[0],s.g[1]]]);s.s[t]++;s.g=[0,0];s.p=[0,0];s.tb=0;if(s.s[t]>=Math.ceil(+r.sets/2)){s.d=1;s.w=t}return s}
-function step(r,s,t){
-  s=snap(s);const o=1-t;
-  if(r.t=='badminton'){s.p[t]++;if(s.p[t]>=21){s.d=1;s.w=t}return s}
-  if(s.tb){s.p[t]++;if(s.p[t]>=7&&s.p[t]-s.p[o]>=2){s.g[t]++;return setWin(r,s,t)}return s} // tie-break padel
-  s.p[t]++;
-  const gw=(r.t=='padel'&&r.golden)?s.p[t]>=4:(s.p[t]>=4&&s.p[t]-s.p[o]>=2);
-  if(!gw)return s;
-  s.p=[0,0];s.g[t]++;
-  if(r.t=='padel'&&!(+r.sets>0)){const n=+r.n;if(s.g[t]*2>n||s.g[0]+s.g[1]==n){s.d=1;s.w=s.g[0]==s.g[1]?-1:s.g[0]>s.g[1]?0:1}return s}
-  if(s.g[t]>=6&&(s.g[t]-s.g[o]>=2||s.g[t]==7))return setWin(r,s,t);
-  if(r.t=='padel'&&s.g[0]==6&&s.g[1]==6)s.tb=1;
-  return s}
-function tp(p,t){const a=p[t],b=p[1-t];if(a>=3&&b>=3)return a>b?'AD':'40';return['0','15','30','40'][Math.min(a,3)]}
-const dp=(s,t)=>s.tb?s.p[t]:tp(s.p,t);
-function sm(m){const r=R(m),s=ST(m);if(!s)return'-';const x=r.t=='badminton'?s.p:hasSets(r)?s.s:s.g;return x[0]+' - '+x[1]}
-
-// ---------- AMERICANO / MEXICANO ----------
-function unitsOf(e){
-  const fix=isFix(R(e)),ps=P(e);
-  return fix?TM(e).map(t=>{const m=[ps.find(p=>p.id==t.a),ps.find(p=>p.id==t.b)].filter(Boolean);return{k:[t.a,t.b].sort().join('+'),m,nm:tn(m,t.t),ok:m.length==2}}).filter(u=>u.ok)
-    :ps.map(p=>({k:p.id,m:[p],nm:p.n}))}
-function stand(e){
-  const fix=isFix(R(e)),T={},nw=(k,n)=>({k,n,m:0,w:0,d:0,l:0,pt:0,gd:0});
-  unitsOf(e).forEach(u=>T[u.k]=nw(u.k,u.nm));
-  S.matches.filter(x=>x.eventId==e.id&&x.status=='done').forEach(m=>{const s=ST(m);if(!s)return;
-    [[0,jp(m.memA),m.teamA],[1,jp(m.memB),m.teamB]].forEach(([t,mm,tm])=>{if(!mm.length)return;
-      (fix?[[mm.map(x=>x.i).sort().join('+'),tm]]:mm.map(x=>[x.i,x.n])).forEach(([k,n])=>{const o=T[k]||(T[k]=nw(k,n));o.m++;o.gd+=(()=>{const x=m.sport=='badminton'?s.p:gOf(s);return(x[t]||0)-(x[1-t]||0)})();
-        if(s.w<0){o.d++;o.pt++}else if(s.w==t){o.w++;o.pt+=3}else o.l++})})});
-  return Object.values(T).sort((a,b)=>b.pt-a.pt||b.gd-a.gd||b.w-a.w||a.n.localeCompare(b.n))}
-function gen(e){
-  const r=R(e),fix=isFix(r),per=fix?2:4,us=unitsOf(e),nm=Math.min(+r.courts||1,Math.floor(us.length/per));if(nm<1)return null;
-  const M=S.matches.filter(m=>m.eventId==e.id),key=(a,b)=>[a,b].sort().join('|'),pc={},oc={},cnt={},bump=(o,k)=>o[k]=(o[k]||0)+1;
-  us.forEach(u=>cnt[u.k]=0);
-  const ks=mm=>fix?[mm.map(y=>y.i).sort().join('+')]:mm.map(y=>y.i);
-  M.forEach(m=>{const A=ks(jp(m.memA)),B=ks(jp(m.memB));if(!jp(m.memA).length||!jp(m.memB).length)return;A.concat(B).forEach(k=>cnt[k]=(cnt[k]||0)+1);
-    if(!fix){bump(pc,key(A[0],A[1]));bump(pc,key(B[0],B[1]))}A.forEach(a=>B.forEach(b=>bump(oc,key(a,b))))});
-  const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
-  const act=sh(us).sort((a,b)=>(cnt[a.k]||0)-(cnt[b.k]||0)).slice(0,nm*per);
-  const mem=p=>({i:p.id,n:p.n,u:p.u||''});
-  const mkm=(A,B)=>{const ma=fix?A[0].m:A.map(u=>u.m[0]),mb=fix?B[0].m:B.map(u=>u.m[0]);
-    return{teamA:fix?A[0].nm:tn(ma),teamB:fix?B[0].nm:tn(mb),memA:ma.map(mem),memB:mb.map(mem),kA:A.map(u=>u.k),kB:B.map(u=>u.k)}};
-  const build=a=>{const o=[];for(let i=0;i<a.length;i+=per)o.push(fix?mkm([a[i]],[a[i+1]]):mkm([a[i],a[i+1]],[a[i+2],a[i+3]]));return o};
-  const clean=o=>o.map(({teamA,teamB,memA,memB})=>({teamA,teamB,memA,memB}));
-  if(r.fmt=='mexicano'&&M.some(m=>m.status=='done')){
-    const rk=stand(e).map(x=>x.k),a=act.sort((x,y)=>rk.indexOf(x.k)-rk.indexOf(y.k));
-    if(fix)return clean(build(a));const o=[];for(let i=0;i<a.length;i+=4)o.push(mkm([a[i],a[i+3]],[a[i+1],a[i+2]]));return clean(o)}
-  let best,bc=1e9;
-  for(let k=0;k<300;k++){const o=build(sh(act));let c=0;
-    o.forEach(m=>{if(!fix)c+=10*((pc[key(m.kA[0],m.kA[1])]||0)+(pc[key(m.kB[0],m.kB[1])]||0));m.kA.forEach(a=>m.kB.forEach(b=>c+=oc[key(a,b)]||0))});
-    if(c<bc){bc=c;best=o}}
-  return clean(best)}
-async function newRound(id){
-  const e=S.events.find(x=>x.id==id),M=S.matches.filter(m=>m.eventId==id);
-  if(isFix(R(e))&&unitsOf(e).length<2)return toast('Buat minimal 2 tim dulu');
-  if(M.some(m=>m.status!='done')&&!confirm('Masih ada pertandingan belum selesai. Tetap buat ronde baru?'))return;
-  const o=gen(e);if(!o)return toast('Peserta kurang (min 4 orang / 2 tim)');
-  const rd=Math.max(0,...M.map(m=>+m.round||0))+1;
-  const r=await call('addRound',{id,round:rd,ms:JSON.stringify(o)});toast(r.ok?'Ronde '+rd+' dibuat':r.error);lastAct=0;load()}
-
-// ---------- EVENTS ----------
-function eventsOld(){
-  const e=evId&&S.events.find(x=>x.id==evId);
-  if(e){try{return evDetail(e)}catch(err){console.error(err);toast('Gagal membuka event: '+err.message,6000);evId=null}}
-  // ... sisa fungsi (daftar event) tetap sama
-  $('#v').innerHTML=`<div class="flex justify-between items-center"><h2 class="text-2xl font-black uppercase">Event</h2><button onclick="evForm()" class="b">+ Event Baru</button></div>
-  <div class="grid md:grid-cols-3 gap-4">${S.events.map(e=>`<div class="c p-5 space-y-2">
-   <div class="text-xs font-bold uppercase text-orange-400">${SPORT[e.sport]}</div><h3 class="font-extrabold text-lg">${esc(e.name)}</h3>
-   <p class="text-xs text-zinc-400">${esc(rl(R(e)))}<br>📍 ${esc(e.location)} · ${esc(fd(e.date))}<br>👥 ${P(e).length} peserta</p>
-   <div class="flex justify-between pt-3 border-t border-zinc-900 text-xs font-bold"><button class="text-orange-400" onclick="evId='${e.id}';events()">Open & Join →</button>
-   ${e.createdBy==U.id?`<button class="text-red-400" onclick="delEv('${e.id}')">Hapus</button>`:''}</div></div>`).join('')||'<p class="text-zinc-500">Belum ada event.</p>'}</div>`;
-}
-function evDetailOld(e){
-  const r=R(e),fmt=r.fmt||'single',fix=isFix(r),ps=P(e),tm=TM(e),own=e.createdBy==U.id,M=S.matches.filter(m=>m.eventId==e.id),joined=ps.some(p=>p.u==U.id);
-  const rs=[...new Set(M.map(m=>+m.round||0))].sort((a,b)=>a-b),sd=M.some(m=>m.status=='done')?stand(e):[],free=ps.filter(p=>!tm.some(t=>t.a==p.id||t.b==p.id));
-  $('#v').innerHTML=`<button class="text-xs font-bold text-zinc-400" onclick="evId=null;events()">← Semua event</button>
-  <div class="c p-5 space-y-2"><div class="flex justify-between gap-2"><div><div class="text-xs font-bold uppercase text-orange-400">${SPORT[e.sport]}</div>  ${fmt=='single'?`<button class="b w-full !py-4"</div>
-  ${own?`<div class="flex gap-2 h-fit"><button class="g !px-3" onclick="evForm('${e.id}')">✎ Edit</button><button class="${e.status=='done'?'g':'b'} !px-3" onclick="finishEv('${e.id}')">${e.status=='done'?'Buka lagi':'🏁 Finish Event'}</button></div>`:''}</div>
-  <p class="text-xs text-zinc-400">${esc(rl(r))}<br>📍 ${esc(e.location)} · ${esc(fd(e.date))}</p></div>
-  <div class="c p-5 space-y-3"><div class="flex justify-between items-center gap-2"><h3 class="text-sm font-extrabold uppercase">Peserta (${ps.length})</h3>
-   <button class="${joined?'g':'b'}" onclick="joinSelf('${e.id}')">${joined?'Keluar dari event':'+ Join event'}</button></div>
-   <div class="flex flex-wrap gap-2">${ps.map(p=>`<span class="bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1 text-xs font-semibold">${esc(p.n)}${p.u?'':' <span class="text-zinc-500">(Guest)</span>'}${own?` <button class="text-red-400 ml-1" onclick="rmPl('${e.id}','${p.id}')">✕</button>`:''}</span>`).join('')||'<span class="text-xs text-zinc-500">Belum ada peserta</span>'}</div>
-   <div class="text-xs font-bold uppercase text-zinc-400">Pengguna terdaftar (klik untuk menambah)</div>
-   <div id="sg" class="flex flex-wrap gap-2">${sgHtml(e,'')}</div>
-   <input id="np" class="i" placeholder="Cari nama / ketik nama Guest (pisahkan koma)" oninput="$('#sg').innerHTML=sgHtml(S.events.find(x=>x.id=='${e.id}'),this.value)">
-   <button class="g w-full" onclick="addPl('${e.id}')">+ Daftarkan peserta</button>
-   <p class="text-xs text-zinc-500">Nama yang cocok dengan pengguna terdaftar masuk leaderboard utama. Guest tidak masuk leaderboard utama. Bisa ditambah kapan saja, termasuk saat event berlangsung.</p></div>
-  ${fix?`<div class="c p-5 space-y-3"><h3 class="text-sm font-extrabold uppercase">Tim (${tm.length})</h3>
-   ${tm.map((t,i)=>{const m=[ps.find(p=>p.id==t.a),ps.find(p=>p.id==t.b)].filter(Boolean);return`<div class="flex justify-between text-sm bg-zinc-900/50 rounded-lg px-3 py-2"><b>${esc(tn(m,t.t))}</b>${own?`<button class="text-red-400" onclick="rmTeam('${e.id}',${i})">✕</button>`:''}</div>`}).join('')||'<p class="text-xs text-zinc-500">Belum ada tim</p>'}
-   <div class="grid grid-cols-2 gap-2"><select id="ta1" class="i"><option value="">Pemain 1</option>${free.map(p=>`<option value="${p.id}">${esc(p.n)}</option>`).join('')}</select><select id="ta2" class="i"><option value="">Pemain 2</option>${free.map(p=>`<option value="${p.id}">${esc(p.n)}</option>`).join('')}</select></div>
-   <input id="tnm" class="i" placeholder="Nama tim (opsional, default nama depan)"><button class="g w-full" onclick="mkTeam('${e.id}')">+ Buat tim</button></div>`:''}
-<h3 class="font-extrabold text-lg">${esc(e.name)}${e.status=='done'?' <span class="text-[10px] font-bold text-emerald-400 align-middle">FINISH</span>':''}</h3> onclick="newForm('${e.id}')">▶ Mulai Pertandingan</button>`
-   :`<button class="b w-full !py-4" onclick="newRound('${e.id}')">▶ Buat Ronde ${rs.length?Math.max(...rs)+1:1}${fmt=='mexicano'&&sd.length?' (urut klasemen)':''}</button>`}
-  ${sd.length?`<div class="c overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs text-zinc-400 uppercase bg-zinc-900/50"><tr><th class="p-3">#</th><th class="p-3">${fix?'Tim':'Pemain'}</th><th class="p-3 text-center">M</th><th class="p-3 text-center">W</th><th class="p-3 text-center">D</th><th class="p-3 text-center">L</th><th class="p-3 text-center">+/-</th><th class="p-3 text-right">Poin</th></tr></thead><tbody class="divide-y divide-zinc-900">
-   ${sd.map((x,i)=>`<tr><td class="p-3 font-black">${i+1}</td><td class="p-3 font-bold">${esc(x.n)}</td><td class="p-3 text-center">${x.m}</td><td class="p-3 text-center text-emerald-400">${x.w}</td><td class="p-3 text-center">${x.d}</td><td class="p-3 text-center text-red-400">${x.l}</td><td class="p-3 text-center">${x.gd}</td><td class="p-3 text-right font-black">${x.pt}</td></tr>`).join('')}</tbody></table></div>`:''}
-  ${rs.map(rd=>`<div class="space-y-2"><h3 class="text-xs font-bold uppercase text-zinc-400">${rd?'Ronde '+rd:'Pertandingan'}</h3>
-   ${M.filter(m=>(+m.round||0)==rd).map(m=>`<div onclick="openM('${m.id}')" class="c p-3 cursor-pointer flex justify-between items-center gap-2"><div class="min-w-0"><div class="text-[10px] text-zinc-500">${m.court?'Lapangan '+esc(m.court):''}</div><div class="text-sm font-bold truncate">${esc(m.teamA)} <span class="text-zinc-500">vs</span> ${esc(m.teamB)}</div></div>
-   <div class="text-right shrink-0">${badge(m)}${m.status=='upcoming'?`<button class="b !py-1.5 !px-3 mt-1" onclick="event.stopPropagation();startForm('${m.id}')">▶ Mulai</button>`:`<div class="font-black">${sm(m)}</div>`}</div></div>`).join('')}</div>`).join('')}`;
-}
-
-let evTab=null;
-function evT(t){evTab=t;events()}
-function events(){
-  const e=evId&&S.events.find(x=>x.id==evId);
-  if(e){try{return evDetail(e)}catch(err){console.error(err);toast('Gagal membuka event: '+err.message,6000);evId=null}}
-  $('#v').innerHTML=`<div class="flex justify-between items-center"><h2 class="text-2xl font-black uppercase">Event</h2><button onclick="evForm()" class="b">+ Event Baru</button></div>
-  <div class="grid md:grid-cols-3 gap-4">${S.events.slice().reverse().map(e=>{
-    const M=S.matches.filter(m=>m.eventId==e.id),live=M.filter(m=>m.status=='live').length,done=e.status=='done';
-    return`<div onclick="evId='${e.id}';evTab=null;events()" class="c p-5 space-y-2 cursor-pointer hover:border-zinc-600 ${live?'livecard':''}">
-     <div class="flex justify-between items-center"><div class="text-xs font-bold uppercase text-orange-400">${SPORT[e.sport]}</div>${live?'<span class="text-[10px] font-bold text-red-400">● LIVE</span>':done?'<span class="text-[10px] font-bold text-emerald-400">FINISH</span>':''}</div>
-     <h3 class="font-extrabold text-lg">${esc(e.name)}</h3>
-     <p class="text-xs text-zinc-400">${esc(rl(R(e)))}<br>📍 ${esc(e.location)} · ${esc(fd(e.date))}</p>
-     <div class="flex gap-4 text-xs text-zinc-300"><span>👥 ${P(e).length} peserta</span><span>🎾 ${M.length} pertandingan</span></div>
-     <div class="flex justify-between pt-3 border-t border-zinc-900 text-xs font-bold"><span class="text-orange-400">Buka detail →</span>
-     ${e.createdBy==U.id?`<button class="text-red-400" onclick="event.stopPropagation();delEv('${e.id}')">Hapus</button>`:''}</div></div>`}).join('')||'<p class="text-zinc-500">Belum ada event.</p>'}</div>`;
-}
-function evDetail(e){
-  const r=R(e),fmt=r.fmt||'single',fix=isFix(r),ps=P(e),tm=TM(e),own=e.createdBy==U.id,done=e.status=='done';
-  const M=S.matches.filter(m=>m.eventId==e.id),joined=ps.some(p=>p.u==U.id);
-  const nDone=M.filter(m=>m.status=='done').length,nLive=M.filter(m=>m.status=='live').length;
-  const rs=[...new Set(M.map(m=>+m.round||0))].sort((a,b)=>a-b),free=ps.filter(p=>!tm.some(t=>t.a==p.id||t.b==p.id));
-  const sd=nDone?stand(e):[],tb=evTab||(M.length?'main':'peserta');
-  const creator=(S.users.find(u=>u.id==e.createdBy)||{}).name||'-';
-  const stat=(l,v,c)=>`<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-center"><div class="text-[10px] text-zinc-400 uppercase font-bold">${l}</div><div class="text-xl font-black ${c||''}">${v}</div></div>`;
-  const tabBtn=(k,l)=>`<button onclick="evT('${k}')" class="flex-1 px-3 py-2 rounded-lg text-xs font-bold uppercase whitespace-nowrap ${tb==k?'bg-white text-black':'bg-zinc-900 border border-zinc-800 text-zinc-300'}">${l}</button>`;
-  const row=(l,v)=>`<div class="flex justify-between gap-3 text-sm py-2 border-b border-zinc-900"><span class="text-zinc-400">${l}</span><span class="font-semibold text-right">${v}</span></div>`;
-  const scoring=r.t=='padel'?(+r.sets>0?(r.sets==1?'1 set + tie-break':'Best of '+r.sets+' set + tie-break'):'Best of '+r.n+' game'):r.t=='tennis'?(r.sets==1?'1 set (6 game)':'Best of '+r.sets+' set'):'Langsung 21 poin';
-
-  const pesertaHtml=`<div class="c p-5 space-y-3"><h3 class="text-sm font-extrabold uppercase">Peserta (${ps.length})</h3>
-   <div class="flex flex-wrap gap-2">${ps.map(p=>`<span class="bg-zinc-900 border border-zinc-800 rounded-full px-3 py-1 text-xs font-semibold">${esc(p.n)}${p.u?'':' <span class="text-zinc-500">(Guest)</span>'}${own?` <button class="text-red-400 ml-1" onclick="rmPl('${e.id}','${p.id}')">✕</button>`:''}</span>`).join('')||'<span class="text-xs text-zinc-500">Belum ada peserta</span>'}</div>
-   <div class="text-xs font-bold uppercase text-zinc-400 pt-2">Tambah peserta (ketuk untuk menambah)</div>
-   <div id="sg" class="flex flex-wrap gap-2">${sgHtml(e,'')}</div>
-   <input id="np" class="i" placeholder="Cari nama / ketik nama Guest (pisahkan koma)" oninput="$('#sg').innerHTML=sgHtml(S.events.find(x=>x.id=='${e.id}'),this.value)">
-   <button class="g w-full" onclick="addPl('${e.id}')">+ Daftarkan peserta</button>
-   <p class="text-xs text-zinc-500">Guest tidak masuk leaderboard utama.</p></div>
-  ${fix?`<div class="c p-5 space-y-3"><h3 class="text-sm font-extrabold uppercase">Tim Fix Partner (${tm.length})</h3>
-   ${tm.map((t,i)=>{const m=[ps.find(p=>p.id==t.a),ps.find(p=>p.id==t.b)].filter(Boolean);return`<div class="flex justify-between text-sm bg-zinc-900/50 rounded-lg px-3 py-2"><b>${esc(tn(m,t.t))}</b>${own?`<button class="text-red-400" onclick="rmTeam('${e.id}',${i})">✕</button>`:''}</div>`}).join('')||'<p class="text-xs text-zinc-500">Belum ada tim</p>'}
-   <div class="grid grid-cols-2 gap-2"><select id="ta1" class="i"><option value="">Pemain 1</option>${free.map(p=>`<option value="${p.id}">${esc(p.n)}</option>`).join('')}</select><select id="ta2" class="i"><option value="">Pemain 2</option>${free.map(p=>`<option value="${p.id}">${esc(p.n)}</option>`).join('')}</select></div>
-   <input id="tnm" class="i" placeholder="Nama tim (opsional, default nama depan)"><button class="g w-full" onclick="mkTeam('${e.id}')">+ Buat tim</button></div>`:''}`;
-
-  const mainHtml=`${done?'<div class="c p-4 text-center text-sm font-bold text-emerald-400">🏁 Event selesai</div>'
-    :fmt=='single'?`<button class="b w-full !py-4" onclick="newForm('${e.id}')">▶ Mulai Pertandingan</button>`
-    :`<button class="b w-full !py-4" onclick="newRound('${e.id}')">▶ Buat Ronde ${rs.length?Math.max(...rs)+1:1}${fmt=='mexicano'&&sd.length?' (urut klasemen)':''}</button>`}
-  ${rs.map(rd=>`<div class="space-y-2"><h3 class="text-xs font-bold uppercase text-zinc-400">${rd?'Ronde '+rd:'Pertandingan'}</h3>
-   ${M.filter(m=>(+m.round||0)==rd).map(m=>`<div onclick="openM('${m.id}')" class="c p-3 cursor-pointer flex justify-between items-center gap-2 ${m.status=='live'?'livecard':''}"><div class="min-w-0"><div class="text-[10px] text-zinc-500">${m.court?'Lapangan '+esc(m.court):''}${m.refereeName?' · Wasit: '+esc(m.refereeName):''}</div><div class="text-sm font-bold truncate">${esc(m.teamA)} <span class="text-zinc-500">vs</span> ${esc(m.teamB)}</div></div>
-   <div class="text-right shrink-0">${badge(m)}${m.status=='upcoming'?`<button class="b !py-1.5 !px-3 mt-1" onclick="event.stopPropagation();startForm('${m.id}')">▶ Mulai</button>`:`<div class="font-black">${sm(m)}</div>`}</div></div>`).join('')}</div>`).join('')||'<p class="text-xs text-zinc-500 text-center py-4">Belum ada pertandingan.</p>'}`;
-
-  const boardHtml=sd.length?`<div class="text-[11px] text-zinc-500 text-right">${r.t=='padel'?'M 3 · S 1 · K 0 · Pembeda: selisih game':r.t=='tennis'?'M 3 · K 0 · Pembeda: selisih game':'M 3 · K 0 · Pembeda: selisih poin'}</div>
-   <div class="c overflow-x-auto"><table class="w-full text-sm text-left"><thead class="text-xs text-zinc-400 uppercase bg-zinc-900/50"><tr><th class="p-3 text-center">#</th><th class="p-3">${fix?'Tim':'Pemain'}</th><th class="p-3 text-center">M</th><th class="p-3 text-center">W</th><th class="p-3 text-center">D</th><th class="p-3 text-center">L</th><th class="p-3 text-center">+/-</th><th class="p-3 text-right">Poin</th></tr></thead><tbody class="divide-y divide-zinc-900">
-   ${sd.map((x,i)=>`<tr><td class="p-3 text-center font-black">${i<3?['🥇','🥈','🥉'][i]:i+1}</td><td class="p-3 font-bold">${esc(x.n)}</td><td class="p-3 text-center">${x.m}</td><td class="p-3 text-center text-emerald-400">${x.w}</td><td class="p-3 text-center">${x.d}</td><td class="p-3 text-center text-red-400">${x.l}</td><td class="p-3 text-center">${x.gd>0?'+':''}${x.gd}</td><td class="p-3 text-right font-black">${x.pt}</td></tr>`).join('')}</tbody></table></div>`
-   :'<p class="text-xs text-zinc-500 text-center py-6">Leaderboard muncul setelah ada pertandingan yang selesai.</p>';
-
-  const infoHtml=`<div class="c p-5">${row('Olahraga',SPORT[e.sport])}${row('Format',FMT[fmt]||fmt)}${r.t=='padel'&&fmt!='single'?row('Partner',fix?'Fix Partner':'Mix Partner'):''}${row('Sistem skor',scoring)}${r.t=='padel'?row('Poin game',r.golden?'Golden point':'Advantage'):''}${r.t=='padel'&&fmt!='single'?row('Jumlah lapangan',r.courts||1):''}${row('Tanggal',esc(fd(e.date)))}${row('Lokasi',esc(e.location))}${row('Dibuat oleh',esc(creator))}${row('Status',done?'Selesai':'Berjalan')}</div>`;
-
-  $('#v').innerHTML=`<button class="text-xs font-bold text-zinc-400" onclick="evId=null;events()">← Semua event</button>
-  <div class="c p-5 space-y-4">
-   <div class="flex justify-between gap-3 flex-wrap"><div class="min-w-0"><div class="text-xs font-bold uppercase text-orange-400">${SPORT[e.sport]}</div>
-    <h2 class="text-2xl font-black">${esc(e.name)}${done?' <span class="text-[10px] font-bold text-emerald-400 align-middle">FINISH</span>':''}</h2>
-    <p class="text-xs text-zinc-400 mt-1">${esc(rl(r))}<br>📍 ${esc(e.location)} · ${esc(fd(e.date))}</p></div>
-   <div class="flex gap-2 h-fit flex-wrap">${done?'':`<button class="${joined?'g':'b'}" onclick="joinSelf('${e.id}')">${joined?'✓ Terdaftar · Keluar':'+ Gabung event'}</button>`}
-    ${own?`<button class="g !px-3" onclick="evForm('${e.id}')">✎ Edit</button><button class="${done?'g':'b'} !px-3" onclick="finishEv('${e.id}')">${done?'Buka lagi':'🏁 Finish'}</button>`:''}</div></div>
-   <div class="grid grid-cols-4 gap-2">${stat('Peserta',ps.length)}${stat('Main',M.length)}${stat('Live',nLive,nLive?'text-red-400':'')}${stat('Selesai',nDone,'text-emerald-400')}</div></div>
-  ${nLive?`<div onclick="evT('main')" class="livecard c p-3 text-center text-xs font-bold text-red-400 cursor-pointer">● ${nLive} pertandingan sedang berlangsung</div>`:''}
-  <div class="flex gap-2 overflow-x-auto">${tabBtn('main','Pertandingan')}${tabBtn('board','Leaderboard')}${tabBtn('peserta','Peserta')}${tabBtn('info','Info')}</div>
-  ${tb=='main'?mainHtml:tb=='board'?boardHtml:tb=='peserta'?pesertaHtml:infoHtml}`;
-}
-
-function finishEv(id){
-  const e=S.events.find(x=>x.id==id);if(!e)return;
-  const done=e.status=='done';
-  if(!done){const open=S.matches.filter(m=>m.eventId==id&&m.status!='done').length;
-    if(!confirm(open?open+' pertandingan belum selesai. Tetap finish event?':'Finish event ini?'))return}
-  srv('setEventStatus',{id,status:done?'active':'done'},done?'Event dibuka lagi':'Event selesai')}
-
-function addPl(id){
-  const e=S.events.find(x=>x.id==id),v=$('#np').value.split(/[,\n]/).map(x=>x.trim()).filter(Boolean);
-  if(!v.length)return toast('Isi nama dulu');
-  const a=P(e).slice(),list=[];
-  v.forEach(n=>{const u=S.users.find(x=>x.name.toLowerCase()==n.toLowerCase()),nm=u?u.name:n;
-    if(a.some(p=>(u&&p.u==u.id)||p.n.toLowerCase()==nm.toLowerCase()))return;
-    const it={id:rid(),n:nm,u:u?u.id:''};a.push(it);list.push(it)});
-  if(!list.length)return toast('Sudah terdaftar');
-  opt('addPlayers',{id,list:JSON.stringify(list)},()=>{e.players=JSON.stringify(a)},list.length+' peserta didaftarkan')}
-function joinSelf(id){
-  const e=S.events.find(x=>x.id==id),a=P(e),mine=a.find(p=>p.u==U.id);
-  if(mine){if(!confirm('Keluar dari event ini?'))return;
-    opt('leaveEvent',{id},()=>{e.players=JSON.stringify(a.filter(p=>p.id!=mine.id));e.teams=JSON.stringify(TM(e).filter(t=>t.a!=mine.id&&t.b!=mine.id))},'Kamu keluar dari event');return}
-  const pid=rid();
-  opt('joinEvent',{id,pid},()=>{e.players=JSON.stringify(a.concat([{id:pid,n:U.name,u:U.id}]))},'Berhasil Join ✓')}
-function rmPl(id,pid){const e=S.events.find(x=>x.id==id),p=P(e).find(x=>x.id==pid);if(!p||!confirm('Hapus '+p.n+'?'))return;
-  opt('rmPlayer',{id,pid},()=>{e.players=JSON.stringify(P(e).filter(x=>x.id!=pid));e.teams=JSON.stringify(TM(e).filter(t=>t.a!=pid&&t.b!=pid))},'Peserta dihapus')}
-async function setF(id,field,val){const r=await call('setField',{id,field,val:JSON.stringify(val)});toast(r.ok?'Tersimpan':r.error);lastAct=0;load()}
-function mkTeam(id){const e=S.events.find(x=>x.id==id),a=$('#ta1').value,b=$('#ta2').value;if(!a||!b||a==b)return toast('Pilih 2 pemain berbeda');setF(id,'teams',TM(e).concat([{a,b,t:$('#tnm').value.trim()}]))}
-function rmTeam(id,i){const e=S.events.find(x=>x.id==id),t=TM(e).slice();t.splice(i,1);setF(id,'teams',t)}
-function evForm(id){
-  ED=id?S.events.find(x=>x.id==id):null;const d=ED?R(ED):{t:'padel',fmt:'single',partner:'mix',n:4,golden:1,courts:1,sets:0},sel=(a,b)=>a==b?'selected':'';
-  modal(`<h3 class="font-black uppercase">${ED?'Edit Event':'Buat Event Baru'}</h3><input id="en" class="i" placeholder="Nama event" value="${esc(ED?ED.name:'')}">
-  <select id="es" class="i" onchange="rf()" ${ED?'disabled':''}><option value="padel" ${sel(d.t,'padel')}>Padel</option><option value="badminton" ${sel(d.t,'badminton')}>Bulu Tangkis</option><option value="tennis" ${sel(d.t,'tennis')}>Tenis</option></select><div id="rf"></div>
-  <div class="grid grid-cols-2 gap-3"><input id="ed" type="datetime-local" class="i" value="${toLocalInput(ED?ED.date:'')}"><input id="el" class="i" placeholder="Lokasi" value="${esc(ED?ED.location:'')}"></div>
-  ${ED?'<p class="text-xs text-zinc-500">Perubahan aturan berlaku untuk pertandingan yang belum dimulai.</p>':'<div class="text-xs font-bold uppercase text-zinc-400">Peserta awal (opsional)</div><div id="sgn" class="flex flex-wrap gap-2"></div><textarea id="ep" class="i" rows="2" oninput="sgNew()" placeholder="Kelik nama di atas, atau ketik nama lain (Guest): Ade, Egi, Edo"></textarea>'}
-  <div class="flex justify-end gap-2 pt-2"><button class="g" onclick="closeM()">Batal</button><button class="b" onclick="saveEv()">${ED?'Save':'Buat'}</button></div>`);rf();if(!ED)sgNew();
-}
-function rf(){
-  const s=$('#es').value,d=ED?R(ED):{},sel=(a,b)=>a==b?'selected':'',ds=+d.sets||0;
-  $('#rf').innerHTML=s=='padel'?`<div class="grid grid-cols-2 gap-3">
-   <select id="rm" class="i"><option value="single" ${sel(d.fmt,'single')}>Pertandingan bebas</option><option value="americano" ${sel(d.fmt,'americano')}>Americano</option><option value="mexicano" ${sel(d.fmt,'mexicano')}>Mexicano</option></select>
-   <select id="rp" class="i"><option value="mix" ${sel(d.partner,'mix')}>Mix Partner</option><option value="fix" ${sel(d.partner,'fix')}>Fix Partner</option></select>
-   <select id="rs" class="i"><option value="0" ${sel(ds,0)}>Skor: game saja</option><option value="1" ${sel(ds,1)}>Skor: 1 set + tie-break</option><option value="3" ${sel(ds,3)}>Skor: best of 3 set + tie-break</option></select>
-   <select id="rn" class="i">${[4,5,6,8].map(n=>`<option value="${n}" ${sel(d.n,n)}>Mode game: best of ${n}</option>`).join('')}</select>
-   <select id="rg" class="i"><option value="1" ${d.golden==0?'':'selected'}>Golden point</option><option value="0" ${d.golden==0?'selected':''}>Deuce biasa (advantage)</option></select>
-   <input id="rc" type="number" min="1" max="10" class="i" placeholder="Jumlah lapangan" value="${d.courts||1}"></div>
-   <p class="text-xs text-zinc-500">Mode set (6 game, selisih 2, tie-break 7 poin di 6-6) hanya untuk Pertandingan bebas. Americano/Mexicano memakai mode game. Pertandingan bebas: Anda pilih sendiri pemainnya.</p>`
-  :s=='tennis'?`<select id="rs" class="i"><option value="1" ${sel(d.sets,1)}>1 set (cari 6 game)</option><option value="3" ${sel(d.sets,3)}>Best of 3 set</option><option value="5" ${sel(d.sets,5)}>Best of 5 set</option></select>`:'<p class="text-xs text-zinc-400">Bulu tangkis: langsung 21 poin.</p>'}
-
-  function sgNew(){
-  const t=$('#ep'),parts=t.value.split(/[,\n]/),q=(parts[parts.length-1]||'').trim().toLowerCase(),have=parts.map(x=>x.trim().toLowerCase());
-  const L=S.users.filter(u=>!have.includes(u.name.toLowerCase())&&(!q||u.name.toLowerCase().includes(q))).slice(0,14);
-  $('#sgn').innerHTML=L.map(u=>`<button type="button" class="g !py-1 !px-3 !text-xs" data-n="${esc(u.name)}" onclick="addTo(this.dataset.n)">+ ${esc(u.name)}</button>`).join('')||'<span class="text-xs text-zinc-500">Tidak ada saran. Nama yang diketik akan jadi guest.</span>';
-}
-function addTo(n){
-  const t=$('#ep'),raw=t.value,a=raw.split(/[,\n]/).map(x=>x.trim()).filter(Boolean);
-  if(raw.trim()&&!/[,\n]\s*$/.test(raw))a.pop(); // buang ketikan yang belum selesai, diganti nama yang diketuk
-  if(!a.some(x=>x.toLowerCase()==n.toLowerCase()))a.push(n);
-  t.value=a.join(', ')+', ';sgNew();t.focus();
-}
-
-async function saveEv(){
-  try{
-    const sp=$('#es').value,fm=sp=='padel'?$('#rm').value:'';
-    const rule=sp=='padel'?{t:'padel',fmt:fm,partner:$('#rp').value,n:+$('#rn').value,sets:fm=='single'?+$('#rs').value:0,golden:+$('#rg').value,courts:Math.max(1,+$('#rc').value||1)}:sp=='tennis'?{t:'tennis',sets:+$('#rs').value}:{t:'badminton'};
-    const d={name:$('#en').value.trim(),sport:sp,date:$('#ed').value,location:$('#el').value.trim(),rule:JSON.stringify(rule)};
-    if(!d.name||!d.location)return toast('Lengkapi nama & lokasi');
-    if(ED){d.id=ED.id;closeM();toast('Saving...');const r=await call('updateEvent',d);toast(r.ok?'Event Updated':r.error);lastAct=0;load();return}
-    const us=S.users||[],a=[];
-    ($('#ep').value||'').split(/[,\n]/).map(x=>x.trim()).filter(Boolean).forEach(n=>{
-      const u=us.find(x=>String(x.name).toLowerCase()==n.toLowerCase());
-      if(a.some(p=>p.n.toLowerCase()==n.toLowerCase()))return;
-      a.push({id:rid(),n:u?u.name:n,u:u?u.id:''})});
-    d.players=JSON.stringify(a);
-    toast('Saving...',20000);
-    const r=await call('createEvent',d);if(!r.ok)return toast(r.error||'Gagal menyimpan');
-    closeM();toast('Event dibuat');evId=r.id;tab='events';lastAct=0;go('events');load();
-  }catch(err){console.error(err);toast('Error: '+err.message,6000)}
-}
-async function delEv(id){if(!confirm('Hapus event ini?'))return;const r=await call('deleteEvent',{id});toast(r.ok?'Dihapus':r.error);evId=null;lastAct=0;load()}
-
-// ---------- MULAI PERTANDINGAN ----------
-const refSel=(cur)=>`<label class="block text-xs font-bold uppercase text-zinc-400">Wasit (satu-satunya yang bisa ubah skor)</label><select id="rw" class="i"><option value="">Pilih wasit...</option>${S.users.map(u=>`<option value="${u.id}" ${u.id==cur?'selected':''}>${esc(u.name)}${u.id==U.id?' (saya)':''}</option>`).join('')}</select>`;
-function newForm(eid){
-  const e=S.events.find(x=>x.id==eid),ps=P(e),r=R(e);
-  if(ps.length<2)return toast('Daftarkan peserta dulu (min 2 orang)');
-  const opts=ph=>`<option value="">${ph}</option>`+ps.map(p=>`<option value="${p.id}">${esc(p.n)}${p.u?'':' (Guest)'}</option>`).join(''),o1=opts('Pilih pemain'),o2=opts(r.t=='padel'?'Pilih pemain':'Pemain 2 (opsional)');
-  modal(`<h3 class="font-black uppercase">Mulai Pertandingan</h3><p class="text-xs text-zinc-400">${esc(rl(r))}</p>
-  <div class="text-xs font-bold uppercase text-orange-400">Tim A</div><div class="grid grid-cols-2 gap-2"><select id="a1" class="i">${o1}</select><select id="a2" class="i">${o2}</select></div><input id="na" class="i" placeholder="Nama tim (opsional, default nama depan pemain)">
-  <div class="text-xs font-bold uppercase text-orange-400">Tim B</div><div class="grid grid-cols-2 gap-2"><select id="b1" class="i">${o1}</select><select id="b2" class="i">${o2}</select></div><input id="nb" class="i" placeholder="Nama tim (opsional, default nama depan pemain)">
-  ${refSel()}<div class="flex justify-end gap-2 pt-2"><button class="g" onclick="closeM()">Batal</button><button class="b" onclick="doNew('${eid}')">▶ Mulai</button></div>`);
-}
-async function doNew(eid){
-  const e=S.events.find(x=>x.id==eid),r=R(e),ps=P(e),ids=(a,b)=>[$(a).value,$(b).value].filter(Boolean);
-  const A=ids('#a1','#a2'),B=ids('#b1','#b2'),all=A.concat(B),ref=$('#rw').value;
-  if(!A.length||!B.length)return toast('Pilih pemain kedua tim');
-  if(new Set(all).size!=all.length)return toast('Ada pemain yang dipilih dua kali');
-  if(r.t=='padel'&&(A.length<2||B.length<2))return toast('Padel: tiap tim 2 pemain');
-  if(!ref)return toast('Pilih wasit dulu');
-  const mm=l=>l.map(i=>{const p=ps.find(x=>x.id==i);return{i:p.id,n:p.n,u:p.u||''}}),ma=mm(A),mb=mm(B);
-  closeM();const x=await call('newMatch',{id:eid,teamA:tn(ma,$('#na').value),teamB:tn(mb,$('#nb').value),memA:JSON.stringify(ma),memB:JSON.stringify(mb),refUid:ref,st:JSON.stringify(fresh())});
-  if(!x.ok)return toast(x.error);lastAct=0;await load();openM(x.id)}
-function startForm(id){
-  const m=S.matches.find(x=>x.id==id);
-  modal(`<h3 class="font-black uppercase">Mulai Pertandingan</h3><p class="font-bold">${esc(m.teamA)} <span class="text-zinc-500">vs</span> ${esc(m.teamB)}</p><p class="text-xs text-zinc-400">${esc(rl(R(m)))}</p>${refSel()}
-  <div class="flex justify-end gap-2 pt-2"><button class="g" onclick="closeM()">Batal</button><button class="b" onclick="doStart('${id}')">▶ Mulai</button></div>`);
-}
-async function doStart(id){
-  const ref=$('#rw').value;if(!ref)return toast('Pilih wasit dulu');
-  closeM();const r=await call('start',{id,refUid:ref,st:JSON.stringify(fresh())});
-  if(!r.ok)return toast(r.error);lastAct=0;await load();openM(id)}
-function refForm(id){
-  const m=S.matches.find(x=>x.id==id);
-  modal(`<h3 class="font-black uppercase">Ganti Wasit</h3><p class="text-xs text-zinc-400">Wasit saat ini: ${esc(m.refereeName)}. Setelah diganti, hanya wasit baru yang bisa ubah skor.</p>${refSel(m.refereeUid)}
-  <div class="flex justify-end gap-2 pt-2"><button class="g" onclick="closeM()">Batal</button><button class="b" onclick="doRef('${id}')">Save</button></div>`);
-}
-async function doRef(id){const ref=$('#rw').value;if(!ref)return toast('Pilih wasit');closeM();await srv('setReferee',{id,refUid:ref},'Wasit diganti')}
-
-// ---------- LIVE ----------
-const prevSc={};
-const badge=m=>m.status=='live'?'<span class="text-[10px] font-bold text-red-400 flex items-center gap-1.5"><span class="relative flex h-2 w-2"><span class="animate-ping absolute h-full w-full rounded-full bg-red-500 opacity-75"></span><span class="relative rounded-full h-2 w-2 bg-red-500"></span></span>LIVE</span>':m.status=='done'?'<span class="text-[10px] font-bold text-emerald-400">FINISH</span>':'<span class="text-[10px] font-bold text-zinc-400">MENUNGGU</span>';
-function live(){
-  const rk=m=>m.status=='live'?0:m.status=='upcoming'?1:2,M=S.matches.slice().reverse().sort((a,b)=>rk(a)-rk(b));
-  $('#v').innerHTML=`<h2 class="text-2xl font-black uppercase">Pertandingan</h2><p class="text-xs text-zinc-400">Klik pertandingan untuk membuka scoreboard layar penuh.</p>
-  <div class="grid md:grid-cols-2 gap-3">${M.map(x=>`<div onclick="openM('${x.id}')" class="c p-4 cursor-pointer ${x.status=='live'?'livecard':''}"><div class="flex justify-between items-center"><div class="text-xs font-bold truncate">${esc(x.eventName)}${x.round?` · R${esc(x.round)}`:''}${x.court?` · L${esc(x.court)}`:''}</div>${badge(x)}</div>
-  <div class="font-bold truncate mt-1">${esc(x.teamA)} <span class="text-zinc-500">vs</span> ${esc(x.teamB)}</div>${x.status=='upcoming'?'':`<div class="text-2xl font-black">${sm(x)}</div>`}</div>`).join('')||'<p class="text-zinc-500 text-sm">Belum ada pertandingan. Buka event lalu mulai pertandingan.</p>'}</div>`;
-}
-function openM(id){ovId=id;liveId=id;renderOv();
-  const d=document.documentElement;if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen().catch(()=>{})}
-function closeOv(){ovId=null;if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});renderOv()}
-function renderOv(){
-  const o=$('#ov'),m=ovId&&S.matches.find(x=>x.id==ovId);
-  if(!m){o.classList.add('hidden');o.innerHTML='';document.body.style.overflow='';return}
-  o.classList.remove('hidden');document.body.style.overflow='hidden';o.innerHTML=sbHtml(m);
-}
-function sbHtml(m){
-  const r=R(m),s=ST(m)||fresh(),mine=m.refereeUid==U.id,bd=r.t=='badminton',up=m.status=='upcoming',hist=(s.h||[]).length,hs=hasSets(r);
-  const ev=S.events.find(x=>x.id==m.eventId),canRef=!up&&(mine||(ev&&ev.createdBy==U.id));
-  const head=`<div class="flex items-center justify-between gap-2"><div class="flex items-center gap-2 min-w-0"><button class="g !px-3" onclick="closeOv()">✕</button><div class="min-w-0"><div class="text-[11px] font-bold text-orange-400 uppercase truncate">${esc(m.eventName)}${m.round?' · Ronde '+esc(m.round):''}${m.court?' · Lapangan '+esc(m.court):''}</div><div class="text-xs text-zinc-400 truncate">${esc(rl(r))}</div></div></div>
-   <div class="flex items-center gap-2 shrink-0">${badge(m)}${mine&&!up&&hist?`<button class="g !px-3" onclick="un('${m.id}')">↶ Undo</button>`:''}${mine&&!up&&!s.d?`<button class="b !px-3" onclick="finish('${m.id}')">🏁 Finish</button>`:''}${mine&&!up?`<button class="g !px-3" onclick="fixForm('${m.id}')">✎ Koreksi</button>`:''}${canRef?`<button class="g !px-3" onclick="refForm('${m.id}')">👤</button>`:''}<button class="g !px-3" onclick="fs()">⛶</button></div></div>`;
-  const wrap=b=>`<div class="h-full w-full flex flex-col gap-3 p-3" style="padding-top:max(.75rem,env(safe-area-inset-top));padding-bottom:max(.75rem,env(safe-area-inset-bottom))">${head}${b}</div>`;
-  if(up)return wrap(`<div class="flex-1 flex flex-col items-center justify-center gap-5 text-center"><h3 class="font-black" style="font-size:min(8vw,8vh)">${esc(m.teamA)}<br><span class="text-zinc-500 text-base">vs</span><br>${esc(m.teamB)}</h3><button class="b !py-4 !px-10 text-lg" onclick="startForm('${m.id}')">▶ Mulai Pertandingan</button><p class="text-xs text-zinc-500">Pilih wasit dulu sebelum skor bisa berjalan.</p></div>`);
-  if(s.d||m.status=='done'){
-    const big=bd?s.p:hs?s.s:s.g,w=s.w,lbl=bd?'Poin':hs?'Set':'Game';
-    const col=t=>`<div class="flex flex-col items-center justify-center text-center rounded-2xl border-2 ${w==t?'border-emerald-500':'border-zinc-800'} bg-zinc-900/60 p-3 min-h-0 min-w-0"><div class="font-extrabold truncate w-full" style="font-size:min(5vw,4.5vh)">${w==t?'🏆 ':''}${esc(t?m.teamB:m.teamA)}</div><div class="font-black leading-none" style="font-size:min(24vw,36vh)">${big[t]}</div><div class="text-zinc-400" style="font-size:min(4vw,3.5vh)">${lbl}</div></div>`;
-    const det=hs&&(s.sh||[]).length?`<div class="text-center text-zinc-300" style="font-size:min(4vw,3.5vh)">${s.sh.map((x,i)=>'Set '+(i+1)+': <b class="text-white">'+x[0]+'-'+x[1]+'</b>').join(' &nbsp;·&nbsp; ')}</div>`:'';
-    return wrap(`<div class="text-center"><div class="text-xs font-bold text-emerald-400 uppercase tracking-widest">🏁 Rekap Pertandingan</div><div class="font-black" style="font-size:min(6vw,5vh)">${w<0?'Seri':'Pemenang: '+esc(w?m.teamB:m.teamA)}</div></div><div class="flex-1 grid grid-cols-2 gap-3 min-h-0">${col(0)}${col(1)}</div>${det}<p class="text-xs text-zinc-500 text-center">Wasit: <b class="text-zinc-300">${esc(m.refereeName)}</b></p>`);
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const API_URL = 'https://script.google.com/macros/s/AKfycbyhCTz4dDMRNsXrv3MC_GMK9loGWkP2f0uhAXdP4msN_7ByHYEnyXDa7nptsz9uEllz/exec';
+function gsErr(e) {
+  console.error(e);
+  let b = $('gsErr');
+  if (!b) {
+    b = document.createElement('div'); b.id = 'gsErr';
+    b.style.cssText = 'position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:92vw;padding:12px 18px;border-radius:14px;background:#b91c1c;color:#fff;font:600 13px Inter,sans-serif;z-index:5000;box-shadow:0 10px 30px rgba(0,0,0,.3)';
+    document.body.appendChild(b);
   }
-  const side=t=>{const key=m.id+t,v=JSON.stringify([s.p[t],s.g[t],s.s[t]]),pop=prevSc[key]&&prevSc[key]!=v?'pop':'';prevSc[key]=v;
-   return `<div class="flex flex-col justify-between items-center text-center rounded-2xl border-2 ${s.w==t?'border-emerald-500':'border-zinc-800'} bg-zinc-900/60 p-3 min-h-0 min-w-0">
-   <div class="w-full min-w-0"><div class="text-xs font-bold uppercase text-orange-400">Tim ${t?'B':'A'}</div><div class="font-extrabold truncate" style="font-size:min(5vw,4.5vh)">${esc(t?m.teamB:m.teamA)}</div></div>
-   <div class="${pop} font-black leading-none" style="font-size:min(24vw,36vh)">${bd?s.p[t]:dp(s,t)}</div>
-   <div class="text-zinc-400" style="font-size:min(5vw,4.5vh)">${bd?'&nbsp;':`Game <b class="text-white">${s.g[t]}</b>${hs?` · Set <b class="text-white">${s.s[t]}</b>`:''}`}</div>
-   ${mine&&!s.d?`<button class="b w-full mt-2" style="min-height:max(64px,16vh);font-size:min(6vw,5vh)" onclick="pt('${m.id}',${t})">+ Poin</button>`:''}</div>`};
-  const dz=!bd&&!s.d&&!s.tb&&s.p[0]>=3&&s.p[1]>=3?`<div class="text-center text-xs font-black text-amber-400 animate-pulse">${r.golden?'GOLDEN POINT':'DEUCE'}</div>`:'',
-   tbn=s.tb&&!s.d?`<div class="text-center text-xs font-black text-amber-400 animate-pulse">TIE-BREAK (sampai 7, selisih 2)</div>`:'',
-   shl=hs&&(s.sh||[]).length?`<div class="text-center text-sm text-zinc-400">Set: ${s.sh.map(x=>x[0]+'-'+x[1]).join(' · ')}</div>`:'',
-   fin=s.d?`<div class="text-center font-black text-emerald-400 uppercase">🏁 Selesai · ${s.w<0?'Seri':'Pemenang: '+esc(s.w?m.teamB:m.teamA)}</div>`:'';
-  return wrap(`${dz}${tbn}${fin}${shl}<div class="flex-1 grid grid-cols-2 gap-3 min-h-0">${side(0)}${side(1)}</div><p class="text-xs text-zinc-500 text-center">Wasit: <b class="text-zinc-300">${esc(m.refereeName)}</b> · ${mine?'kamu bisa ubah skor':'mode penonton'}</p>`);
+  b.textContent = 'Gagal loading data dari server: ' + (e && e.message || e) + ' (cek API_URL & deploy GAS)';
+  b.style.display = 'block';
+  clearTimeout(b._t); b._t = setTimeout(() => { b.style.display = 'none'; }, 9000);
 }
-async function push(m){
-  lv++;lastAct=Date.now();pq.add(m.id);view();
-  if(pushing)return; // sedang mengirim: skor terbaru dikirim setelahnya
-  pushing=1;
-  while(pq.size){
-    const id=pq.values().next().value;pq.delete(id);
-    const mm=S.matches.find(x=>x.id==id);if(!mm)continue;
-    const s=ST(mm),r=await call('st',{id,st:mm.st,done:s.d});
-    if(!r.ok){toast(r.error,4000);pq.clear();pushing=0;lastAct=0;load();return}
+function gs(fn, args, ok, fail) {
+  if (API_URL.indexOf('GANTI') >= 0) return (fail || gsErr)(new Error('API_URL belum diisi'));
+  // text/plain = "simple request", supaya tidak kena preflight CORS (GAS tidak mendukung OPTIONS)
+  fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: args || [] }) })
+    .then(r => r.json())
+    .then(r => { if (!r.ok) throw new Error(r.error); return r.data; })
+    .then(d => { ok && ok(d); }, e => { (fail || gsErr)(e); });
+}
+
+/* ===== HALAMAN DATA (ring + tabel, satu layar) ===== */
+const ring = id => '<div class="ring"><canvas id="' + id + '"></canvas><div class="ctr"><b id="' + id + 'T">0</b><span>Total boiler</span></div></div><div class="lg" id="' + id + 'L"></div>';
+const mk = (id, nav, h, sub, chart, tb, th) => '<div id="' + id + '" class="page"><div class="header" data-nav="' + nav + '"></div><div class="body"><div class="head"><h1>' + h + '</h1><p>' + sub + '</p></div>'
+  + '<div class="split"><div class="ringcard card">' + ring(chart) + '</div><div class="tablecard card"><table><thead><tr>' + th.map(x => '<th>' + x + '</th>').join('') + '</tr></thead><tbody id="' + tb + '"></tbody></table></div></div></div></div>';
+const dt = (id, h, tb, bodyId, logId, dateTh) => '<div id="' + id + '" class="page"><div class="header" data-nav="back"></div><div class="body detail"><div class="head"><h1>' + h + '</h1><p>Update tanggal dan upload file pendukung.</p></div>'
+  + '<div class="tablecard card"><table><thead><tr><th>PSM</th><th>Pabrik</th><th>Boiler No.</th><th>' + dateTh + '</th><th>Status</th><th>Tanggal Baru</th><th>File Pendukung</th></tr></thead><tbody id="' + bodyId + '"></tbody></table>'
+  + '<div class="save-row"><button class="save-btn" onclick="saveDetailFile(\'' + tb + '\',this)">Save &amp; Upload</button></div></div>'
+  + '<h3>Riwayat Upload</h3><div class="tablecard card"><table><thead><tr><th>No.</th><th>Timestamp</th><th>Uploader</th><th>Tanggal Laporan</th><th>File</th></tr></thead><tbody id="' + logId + '"></tbody></table></div></div></div>';
+$('pages').innerHTML =
+  mk('dashboardPage','monitoring','Heatloss Monitoring','Status laporan heatloss setiap pabrik dan boiler.','donutChart','tableBody',['PSM','Pabrik','Boiler No.','Tanggal Laporan','Status'])
+  + mk('riksaPage','monitoring','Riksa Uji Boiler','Masa berlaku riksa uji setiap boiler.','donutChartRiksa','tableBodyRiksa',['PSM','Pabrik','Boiler No.','Tanggal Riksa','Status'])
+  + '<div id="simulasiPage" class="page"><div class="header" data-nav="monitoring"></div><div class="body"><div class="head head-row"><div><h1>Simulasi Darurat</h1><p>Berlaku 3 bulan sejak tanggal simulasi. Klik baris untuk detail.</p></div><button class="save-btn" onclick="openSimUpdate()">Update Simulasi</button></div>'
+  + '<div class="split"><div class="ringcard card">' + ring('donutChartSim') + '</div><div class="tablecard card"><table class="simtb"><thead><tr><th>PSM</th><th>Pabrik</th><th>Shift 1</th><th>Shift 2</th><th>Kondisi</th><th>Peserta</th></tr></thead><tbody id="tableBodySim"></tbody></table></div></div></div></div>'
+  + mk('routinePage','routine','Routine Inspection','Progres inspeksi rutin boiler di seluruh pabrik.','donutChartRoutine','tableBodyRoutine',['PSM','Pabrik','Boiler No.','Status Inspeksi'])
+  + dt('detailHeatlossPage','Detail Heatloss','heatloss','detailHeatlossBody','uploadedFilesHeatlossList','Tanggal Laporan')
+  + dt('detailRiksaPage','Detail Riksa Uji','riksa','detailRiksaBody','uploadedFilesRiksaList','Tanggal Riksa');
+$('sumGrid').innerHTML = [['Routine','Routine Inspection','Status Inspeksi'],['Heatloss','Heatloss Monitoring','Status Heatloss'],['Riksa','Riksa Uji Boiler','Status Riksa']].map(k =>
+  '<div class="card"><h3>' + k[1] + '</h3>' + ring('summaryChart' + k[0]) + '<div class="tablecard"><table><thead><tr><th>PSM</th><th>Pabrik</th><th>Boiler</th><th>' + k[2] + '</th></tr></thead><tbody id="summaryTableBody' + k[0] + '"></tbody></table></div></div>').join('');
+
+/* ===== INOVASI: generator halaman (BI SMART, MATA SMART, Dashboard S&I) ===== */
+(function () {
+const top = (s, b) => `<div class="st"><small>${s}</small><b>${b}</b></div>`;
+const AI = {
+ '🌡':'<rect x="10" y="3" width="4" height="12" rx="2"/><circle cx="12" cy="18" r="3.2"/><rect class="f a-rise" x="11.2" y="8" width="1.6" height="10" rx=".8"/>',
+ '📋':'<rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4V3h6v1"/><path class="s a-draw" d="M8.5 12.5l2.5 2.5 4.5-5"/>',
+ '🚨':'<path d="M7 19v-5a5 5 0 0 1 10 0v5M5 19h14"/><path class="s a-blink" d="M12 3v2M4.5 6.5L6 8M19.5 6.5L18 8"/>',
+ '📚':'<path d="M5 4h13a1 1 0 0 1 1 1v14H6.5A1.5 1.5 0 0 0 5 20.5z"/><path d="M5 20.5A1.5 1.5 0 0 1 6.5 19H19"/><path class="s a-draw" d="M9 8h6M9 11.5h4"/>',
+ '🏆':'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6M10 17h4"/><circle class="f a-pulse" cx="12" cy="8" r="1.3"/>',
+ '💧':'<path d="M12 3c3.5 4.5 6 7.3 6 10.5a6 6 0 0 1-12 0C6 10.3 8.5 7.5 12 3z"/><path class="s a-draw" d="M9.5 14c1 1.2 2 1.2 3 0s2-1.2 2-1.2"/>',
+ '🤖':'<rect x="5" y="8" width="14" height="11" rx="4"/><path d="M12 8V5"/><circle class="f a-float" cx="12" cy="4" r="1.3"/><circle class="f a-blink" cx="9.5" cy="13.5" r="1.2"/><circle class="f a-blink" cx="14.5" cy="13.5" r="1.2"/>',
+ '📊':'<path d="M4 20h16"/><rect class="f a-rise" x="6" y="12" width="3" height="8" rx="1"/><rect class="f a-rise" style="animation-delay:.3s" x="10.5" y="6" width="3" height="14" rx="1"/><rect class="f a-rise" style="animation-delay:.6s" x="15" y="9" width="3" height="11" rx="1"/>',
+ '🛠':'<path d="M5 8h14M5 16h14"/><circle class="f a-float" cx="9" cy="8" r="2.4"/><circle class="f a-float" style="animation-delay:.5s" cx="15" cy="16" r="2.4"/>',
+ '📝':'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path class="s a-draw" d="M9 13h6M9 17h4"/>',
+ '📟':'<rect x="3" y="5" width="18" height="12" rx="2.5"/><path d="M9 20h6M12 17v3"/><path class="s a-draw" d="M6.5 13l3-3 2.5 2 4-4"/>',
+ '📣':'<path d="M4 10v4h3l7 4V6L7 10z"/><path class="s a-blink" d="M17 9c1.5 1.5 1.5 4.5 0 6"/>',
+ '👔':'<path d="M9 3l3 3 3-3"/><path d="M10.5 6h3l1.5 11-3 4-3-4z"/><circle class="f a-pulse" cx="12" cy="12" r="1.1"/>',
+ '⏱':'<circle cx="12" cy="13.5" r="7.5"/><path d="M9.5 3h5M12 3v3"/><path class="s a-spin" d="M12 13.5V9.5" style="transform-box:view-box;transform-origin:12px 13.5px"/>',
+ '⚙':'<rect x="2.5" y="6.5" width="19" height="11" rx="3"/><circle cx="8" cy="12" r="3"/><path class="s a-spin" d="M8 12V10" style="transform-box:view-box;transform-origin:8px 12px;animation-duration:4s"/><rect x="12.5" y="9" width="3.4" height="6" rx="1"/><rect x="17" y="9" width="3.4" height="6" rx="1"/><rect class="f a-roll" x="13.3" y="11.2" width="1.8" height="1.6" rx=".5"/><rect class="f a-roll" style="animation-delay:.7s" x="17.8" y="11.2" width="1.8" height="1.6" rx=".5"/>',
+ '⚡':'<path class="a-blink" d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+ '📦':'<path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/><path class="s a-draw" d="M8 6l8 4"/>',
+ '🔥':'<path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-3-.5-5 1-8z"/><path class="f a-pulse" d="M12 20a2.5 2.5 0 0 1-2.5-2.5c0-1.5 1.5-2.5 2.5-4 1 1.5 2.5 2.5 2.5 4A2.5 2.5 0 0 1 12 20z"/>',
+ '🎓':'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/><path class="s a-draw" d="M22 9v6"/>'
+};
+const ico = e => { const k = String(e).replace(/\uFE0F/g, ''); return AI[k] ? '<svg class="ai" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' + AI[k] + '</svg>' : e; };
+const row = (t, c, x = '') => `<div class="sr">${t}<em class="${x}">${c}</em></div>`;
+const stat = (n, l, c) => `<div class="sx" style="--x:${c}"><b>${n}</b>${l}</div>`;
+const bar = w => `<div class="bar" style="--w:${w}"><i></i></div>`;
+const dn = v => `<div class="dn" style="--v:${v}"></div>`;
+const sb = h => `<div class="sb">${h}</div>`;
+const cols = a => `<div class="cols">${a.map(h => `<i style="--h:${h}%"></i>`).join('')}</div>`;
+const APP = {
+ bi: { id:'biSmartPage', n:'BI SMART', tag:'Aplikasi Mobile · Unit Pabrik & Head Office', h:'Fitur BI SMART',
+  d:'Satu aplikasi untuk memantau kesehatan boiler seluruh pabrik: masa aktif heatloss, sertifikat riksa uji, simulasi keadaan darurat, sampai kompetensi operator. Notifikasi muncul otomatis sebelum masa berlaku habis.',
+  ch:['Heatloss','Riksa Uji','Simulasi Darurat','Learning Centre','MinBoi AI'],
+  nav:['Status','Heatloss','Riksa','Simulasi','Learning'],
+  sc:[
+   ['Status', top('Selamat Datang','Halo, Tim BI') + sb(`<div class="r3">${stat(8,'AKTIF','#14573f')}${stat(2,'PERHATIAN','#d97706')}${stat(1,'EXPIRED','#dc2626')}</div>${row('Boiler 1','HL Aktif')}${row('Boiler 2','Riksa 21 hari','w')}${row('Simulasi Shift 1','Expired','x')}`)],
+   ['Heatloss', top('Monitoring','Heatloss Boiler 1') + sb(`${dn(72)}<p class="ct">Masa aktif tersisa 34 hari</p>${bar('72%')}<div class="btn">⬆ Update Heatloss</div><div class="btn g">📝 Isi Form Foto Thermal</div>`)],
+   ['Riksa Uji', top('Sertifikat · 2 tahun','Riksa Uji') + sb(`${row('Boiler 1','Aktif')}${bar('80%')}${row('Boiler 2','21 hari','w')}${bar('96%')}${row('Boiler 3','Expired','x')}${bar('100%')}`)],
+   ['Simulasi Darurat', top('Keadaan Darurat','Simulasi Shift') + sb(`<div class="r3" style="grid-template-columns:1fr 1fr">${stat('✔','SHIFT 1','#14573f')}${stat('!','SHIFT 2','#dc2626')}</div>${row('2nd Low pompa mati','✓')}${row('Tube / pipa bocor','✓')}${row('Kebakaran & gempa','Belum','x')}`)],
+   ['Learning Centre', top('Assessment','IK Operasional') + sb(`<div class="bar tm" style="--w:100%"><i></i></div><div class="sr">Fungsi gauge glass adalah…</div>${row('A. Mengukur tekanan','')}${row('B. Menunjukkan level air','✓')}${row('C. Mengukur suhu','')}`)]
+  ],
+  f:[
+   ['🌡️','Heatloss','Pantau panas yang bocor dari dinding boiler.','Seperti memeriksa suhu badan boiler: kalau panas banyak keluar lewat dinding, bahan bakar terbuang sia-sia.',['Buka tab <b>Heatloss</b>, pilih boiler.','Tekan <b>Update Heatloss</b>.','Pilih <b>Upload Laporan</b> (PDF/Excel) atau <b>Isi Form Monitoring</b>.','Di form, foto Original dan Thermal tiap titik (wajib sampai Casing samping kanan).','Tekan <b>Preview</b>, cek, lalu <b>Submit</b>.','Masa aktif 4 bulan dihitung dari tanggal laporan; PIC tinjau dokumen.']],
+   ['📋','Riksa Uji','Sertifikat berlaku 2 tahun, status per boiler.','Seperti STNK kendaraan: ada tanggal berlaku, dan harus diperpanjang sebelum habis.',['Berlaku <b>2 tahun</b> sejak tanggal sertifikat.','Status <b>Perhatian</b> muncul saat sisa ≤ 30 hari.','Status <b>Expired</b> bila sudah lewat masa berlaku.','Update lewat tombol di kartu boiler: isi tanggal, upload PDF (maks 10 MB).'],'Detail'],
+   ['🚨','Simulasi Darurat','Catat latihan darurat tiap shift, BA otomatis.','Seperti latihan evakuasi kebakaran: dilakukan berkala supaya semua tahu perannya.',['Buka tab <b>Simulasi</b>, tekan <b>Update</b>.','Pilih <b>Upload Berita Acara</b> atau <b>Isi Form Langsung</b>.','Pilih shift, tanggal, kondisi yang disimulasikan, dan peserta.','Tambahkan foto dokumentasi lalu <b>Preview BA</b>.','Simpan; cetak BA, paraf, lalu upload BA bertanda tangan.']],
+   ['📚','Learning Centre','Materi SOP/IK dan assessment berwaktu.','Seperti ujian SIM: belajar materinya dulu, baru ikut tes dengan batas waktu.',['Buka tab <b>Learning</b> → <b>Materi</b> untuk belajar.','Pindah ke tab <b>Assessment</b>, pilih modul.','Jawab tiap soal sebelum timer habis.','Nilai ≥ 90 dinyatakan lulus; bisa review jawaban atau remedial.']],
+   ['🏆','Event Kompetisi','Leaderboard live antar peserta.','Seperti lomba cerdas cermat: peringkat berubah langsung setiap ada yang selesai.',['Tombol <b>Event</b> muncul saat ada event aktif.','Kerjakan modul yang dikompetisikan.','Skor pertama yang dihitung, +1 poin tiap nilai 100.','Pantau peringkat di tab Leaderboard (refresh 10 detik).']],
+   ['💧','WTP & Breakdown','Kualitas air boiler dan jam breakdown pabrik.','Seperti cek kualitas air minum di rumah: kalau di bawah standar, ada saran perbaikannya.',['Grafik membandingkan bulan terakhir dengan YTD.','Parameter di bawah standar ditandai merah plus rekomendasi.','Klik bar untuk melihat tren bulanan.','Persen breakdown pabrik: klik bulan untuk melihat kejadiannya.'],'Detail'],
+   ['🤖','MinBoi','Asisten chat untuk SOP dan IK.','Seperti punya senior yang selalu siap ditanya kapan saja.',['Tekan ikon MinBoi di pojok kanan bawah.','Ketik pertanyaan seputar SOP / IK Boiler.','Jawaban diambil dari dokumen SOP resmi.']]
+  ]},
+ mata: { id:'mataSmartPage', n:'MATA SMART', tag:'Monitoring And Tracking Application', h:'Fitur MATA SMART',
+  d:'Pantau Temuan, Pastikan Tindakan. Finding inspeksi, log sheet operator, dan laporan lapangan tercatat di satu tempat, lengkap dengan PIC, foto bukti, dan status penyelesaian.',
+  ch:['Finding Monitoring','eForm Log Sheet','Paperless','Lapor!!!'],
+  nav:['Dashboard','Monitoring','eForm','Lapor!!!'],
+  sc:[
+   ['Dashboard', top('Selamat datang,','Tim Pabrik') + sb(`${dn(72)}<p class="ct">72% finding Close</p>${cols([40,62,78,90])}${row('Open','3','x')}`)],
+   ['Monitoring', top('Finding','Monitoring') + sb(`<div class="tg"><div class="tl"><span>⚡</span>Electrical<br><em>80% Close</em></div><div class="tl"><span>🎛️</span>Instrument<br><em>65% Close</em></div><div class="tl"><span>🔥</span>Boiler<br><em>72% Close</em></div><div class="tl"><span>💧</span>WTP<br><em>90% Close</em></div></div>`)],
+   ['eForm', top('Log Sheet','Pilih alat') + sb(`<div class="tg"><div class="tl"><span>🔥</span>Boiler</div><div class="tl"><span>⚙️</span>Turbine</div><div class="tl"><span>🛠️</span>Engine Room</div><div class="tl"><span>🔋</span>Genset</div></div>${row('Jam 14:00 – 15:00','✓')}${row('Jam 15:00 – 16:00','Isi','w')}`)],
+   ['Lapor!!!', top('Laporan lapangan','Lapor!!!') + sb(`<div class="r3">${stat(2,'OPEN','#dc2626')}${stat(3,'PROGRESS','#d97706')}${stat(9,'SELESAI','#2f7d3a')}</div>${row('Bocor steam · Boiler','Open','x')}${row('Lampu mati · Gudang','Progress','w')}${row('Pompa bergetar','Selesai')}`)]
+  ],
+  f:[
+   ['📊','Dashboard Finding','Donut Open/Close dan tren tahunan.','Seperti rapor: sekali lihat, tahu berapa temuan yang sudah beres.',['Donut menunjukkan Open dan Close per pabrik.','Klik donut untuk turun ke kategori, lalu ke daftar temuan.','Bar tren menunjukkan % Close tiga tahun terakhir.','Banner merah muncul untuk follow up yang ditolak atau heatmap yang perlu perhatian.']],
+   ['🛠️','Monitoring','Finding Instrument, Electrical, Boiler, WTP.','Seperti daftar PR: tiap temuan harus dijawab dengan bukti foto.',['Buka <b>Monitoring</b>, pilih kategori.','Klik temuan berstatus Open.','Tulis follow up dan upload foto bukti.','Admin mereview: <b>Approve</b> jadi Close, atau <b>Reject</b> dengan catatan.']],
+   ['📝','eForm Log Sheet','Isi log sheet Boiler, Turbine, Engine Room, Genset.','Seperti buku catatan jaga operator, tapi rapi, per jam, dan tidak bisa hilang.',['Buka <b>eForm</b>, pilih alat.','Pilih Pabrik, unit, dan jam pencatatan.','Isi angka (tekanan, suhu, ampere, dst).','Checklist kondisi muncul sekali di awal periode.','<b>Save</b>; jam yang terlewat ditandai merah di Tabel.']],
+   ['📟','Paperless','Grafik data recorder boiler dan sterilizer.','Seperti rekaman CCTV yang dirangkum per jam: tak perlu menonton semuanya, cukup lihat grafiknya.',['Buka <b>eForm → Paperless Boiler</b> (atau Sterilizer).','Pilih pabrik, lalu <b>Pilih & Upload File</b> (.xlsx/.csv).','Sistem mengenali mesin dari Serial Number dan menolak file yang salah pabrik atau jenis.','Data 2 detik dirata-rata per jam.','Pilih channel di slicer; mode Rata-rata atau Min/Max.','Klik grafik untuk layar penuh landscape.']],
+   ['📣','Lapor!!!','Laporan temuan lapangan sampai tuntas.','Seperti mengirim pesan ke PIC yang tepat, lengkap dengan bukti dan kapan selesainya.',['Pelapor mengirim laporan (lokasi, foto, deskripsi).','Manager menunjuk <b>PIC</b>.','PIC mengisi follow up dan foto.','Manager <b>Approve</b>: status Selesai.','Leaderboard menampilkan pelapor teraktif.']],
+   ['👔','Kunjungan PC & VPM/CEO','Temuan kunjungan manajemen.','Seperti catatan hasil inspeksi mendadak: tiap temuan wajib ada tindak lanjut.',['Daftar dipisah <b>Belum Selesai</b> dan <b>Selesai</b>.','Klik temuan untuk detail dan foto.','PIC mengisi follow up.','Unduh PDF atau Excel per bulan.']],
+   ['💧','WTP & Utilitas','Parameter air dan persen breakdown.','Seperti cek kualitas air dan rapor jam kerja pabrik.',['WTP internal dan eksternal tampil per pabrik.','Parameter di bawah standar menampilkan angka merah.','Klik untuk grafik dan rekomendasi.','Utilitas: klik bulan untuk melihat kejadian breakdown.'],'Detail']
+  ]},
+ si: { id:'dashSIPage', n:'Dashboard S&I', lap:1, tag:'Dashboard Web · Per PSM', h:'Isi Dashboard',
+  d:'Laporan interaktif per PSM yang merangkum seluruh temuan Service & Inspection: breakdown, HM inspeksi, alternator, heatloss, riksa uji, simulasi, assessment, sampai parameter air, lengkap dengan penelusuran sampai ke detail.',
+  ch:['Breakdown','HM Inspeksi','Alternator','Floating Stock','Assessment'],
+  sc:[
+   ['Beranda', top('PSM 1','Service & Inspection Dashboard') + sb(`<div class="r3">${stat(2,'EXPIRED','#C0392B')}${stat(1,'ALTERNATOR','#D68910')}${stat(3,'WTP','#C0392B')}</div>${cols([30,55,70,45,85])}`)],
+   ['HM Inspeksi', top('Batas 5.000 jam','HM Inspeksi Boiler') + sb(`${row('Pabrik A · Boiler 1','5.210 jam','x')}${bar('100%')}${row('Pabrik B · Boiler 2','4.620 jam','w')}${bar('92%')}${row('Pabrik C · Boiler 1','2.100 jam')}${bar('42%')}`)],
+   ['Alternator', top('Tahanan isolasi ≥ 5 MΩ','Hasil Pengukuran') + sb(`${row('Stator R-S-T','Sesuai')}${row('Rotor','Sesuai')}${row('Diode 3','Di luar toleransi','x')}${row('Varistor','Sesuai')}`)]
+  ],
+  f:[
+   ['⏱️','Jam Breakdown','Availability pabrik per bulan.','Seperti catatan jam mesin mogok dibanding jam kerja: semakin kecil mogoknya, semakin tinggi nilai pabrik.',['Rumus: (jam olah − jam breakdown) ÷ jam olah.','Standar 95%; di bawah itu ditandai merah.','Klik bulan untuk daftar kejadian: tanggal, mulai-selesai, stasiun, mesin, keterangan.'],'Detail'],
+   ['⚙️','HM Inspeksi','Jam operasi sejak inspeksi terakhir.','Seperti odometer motor yang menandai jadwal servis.',['Batas 5.000 jam.','Kuning mulai 4.500 jam, merah di atas 5.000.','Tersedia untuk Boiler, Electrical, dan Instrument.','Tabel diurutkan dari HM tertinggi.'],'Detail'],
+   ['⚡','Alternator','Hasil pengukuran TA / DGS / GE.','Seperti cek kesehatan jantung: banyak titik diukur, satu yang tidak normal sudah cukup untuk ditandai.',['Isolasi 1\' dan 10\' harus ≥ 5 MΩ (PI tidak dinilai).','Diode: toleransi ±2% dari rata-rata.','Tahanan gulungan hanya dimonitor.','Klik alat untuk melihat titik yang bermasalah.'],'Detail'],
+   ['📦','Floating Stock','Instrument yang harus dikembalikan.','Seperti buku pinjaman perpustakaan: ada tanggal pinjam dan lama keterlambatan.',['Daftar material, serial number, SPB, dan hari dipinjam.','Diurutkan dari yang paling lama.','Tindak lanjut: kembalikan ke S&I Head Office.'],'Detail'],
+   ['🔥','Heatloss · Riksa · Simulasi','Status masa berlaku per boiler.','Seperti kartu vaksin: ada tanggal berlaku, dan yang kedaluwarsa harus segera diperbarui.',['Heatloss berlaku 4 bulan, Riksa Uji 2 tahun.','Simulasi darurat dicek per shift dan peserta.','Baris merah memuat item expired.'],'Detail'],
+   ['🎓','Assessment & WTP','Nilai SOP/IK dan parameter air.','Seperti rapor dan hasil lab: nilai di bawah standar langsung tampak.',['Lulus ≥ 90, rata-rata per materi dan per peserta.','WTP merah bila di bawah standar, angka kecil = rata-rata YTD.','Klik kartu untuk drill-down ke tabel.'],'Detail']
+  ]}
+};
+function buildApp(k) {
+  const c = APP[k];
+  const sc = c.sc.map((s, i) => `<div class="sc${i ? '' : ' on'}" data-t="${s[0]}">${s[1]}${c.nav ? `<div class="sn">${c.nav.map((n, j) => `<span class="${i === j ? 'on' : ''}">${n}</span>`).join('')}</div>` : ''}</div>`).join('');
+  const dots = c.sc.map((_, i) => `<button class="${i ? '' : 'on'}" onclick="apGo(this.closest('.pcar'),${i})" aria-label="Layar ${i + 1}"></button>`).join('');
+  const fe = c.f.map((f, i) => `<button class="fc" onclick="apOpen('${k}',${i})"><i>${ico(f[0])}</i><b>${f[1]}</b></button>`).join('');
+  $('pages').insertAdjacentHTML('beforeend', `<div id="${c.id}" class="page"><div class="header" data-nav="innovation"></div><div class="scroll snap">
+   <section class="sec ap ap-${k}${c.lap ? ' lap' : ''}">
+    <div class="col"><span class="ap-tag">${c.tag}</span><h2 class="big">${c.n}</h2><p>${c.d}</p><div class="chips2">${c.ch.map(x => `<span>${x}</span>`).join('')}</div><p class="hint">Scroll untuk fitur lengkap, klik kartu untuk analogi cara pakai</p></div>
+    <div class="col pcar" data-i="0" onmouseenter="this.dataset.h=1" onmouseleave="delete this.dataset.h"><div class="pf"><div class="scs">${sc}</div></div><div class="cap">${c.sc[0][0]}</div><div class="dts">${dots}</div></div></section>
+   <section class="sec v ap ap-${k}"><div class="col" style="max-width:1100px"><h2>${c.h}</h2><div class="fgrid">${fe}</div></div></section>
+   <section class="sec v"><div class="contact-box card"><h2>Hubungi Kami</h2><p>Untuk pertanyaan atau bantuan, hubungi:</p><a class="cta" href="mailto:uchfedy@gmail.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>Hubungi via Email</a></div></section>
+  </div></div>`);
+}
+function apGo(c, i) {
+  const s = [...c.querySelectorAll('.sc')], d = [...c.querySelectorAll('.dts button')];
+  i = (i + s.length) % s.length; c.dataset.i = i;
+  s.forEach((x, k) => x.classList.toggle('on', k === i));
+  d.forEach((x, k) => x.classList.toggle('on', k === i));
+  c.querySelector('.cap').textContent = s[i].dataset.t;
+}
+function apOpen(k, i) {
+  const f = APP[k].f[i];
+  $('apm').className = 'on ap-' + k;
+  $('apm').innerHTML = `<div class="apc"><button onclick="apClose()">✕</button><div class="ic2">${ico(f[0])}</div><h3>${f[1]}</h3><div class="ana"><small>Analogi</small>${f[3]}</div><h4>${f[5] || 'Cara pakai'}</h4>${f[5] ? '<ul>' : '<ol>'}${f[4].map(s => `<li>${s}</li>`).join('')}${f[5] ? '</ul>' : '</ol>'}</div>`;
+}
+function apClose() { $('apm').className = ''; }
+document.body.insertAdjacentHTML('beforeend', '<div id="apm" onclick="if(event.target===this)apClose()"></div>');
+['bi', 'mata', 'si'].forEach(buildApp);
+setInterval(() => {
+  const c = document.querySelector('#' + CUR + ' .pcar');
+  if (c && !c.dataset.h) apGo(c, +c.dataset.i + 1);
+}, 3600);
+window.apGo = apGo; window.apOpen = apOpen; window.apClose = apClose;
+})();
+
+/* ===== NAVIGASI ===== */
+let hist = [], CUR = 'welcomePage', pending = null;
+const SHOW = {};
+// subjudul landing: ukuran font dihitung agar lebarnya sama dengan judul
+function fitHero() {
+  const t = document.querySelector('.boiler-title'), s = document.querySelector('.boiler-sub');
+  if (!t || !s || !t.offsetWidth) return;
+  const w = t.scrollWidth;
+  s.style.cssText = 'letter-spacing:0;width:max-content;min-width:0';
+  const nat = s.offsetWidth, n = s.textContent.length;
+  s.style.cssText = 'letter-spacing:' + Math.max(0, (w - nat) / (n - 1)) + 'px';
+}
+SHOW.welcomePage = fitHero;
+window.addEventListener('resize', fitHero);
+fitHero();
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(fitHero);
+function go(id, back) {
+  const to = $(id); if (!to) return;
+  if (!back && CUR !== id) { hist.push(CUR); if (hist.length > 20) hist.shift(); }
+  document.querySelectorAll('.page.active').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.menu-open').forEach(x => x.classList.remove('menu-open'));
+  document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+  to.classList.add('active'); CUR = id;
+  const s = to.querySelector('.scroll'); if (s) s.scrollTop = 0;
+  if (SHOW[id]) SHOW[id]();
+  setTimeout(() => window.Chart && Object.values(Chart.instances).forEach(c => c.resize()), 150);
+}
+function goToWelcome() { hist = []; go('welcomePage', true); }
+function goBack() { go(hist.pop() || 'welcomePage', true); }
+function toggleMenu(btn) { btn.closest('.header,.page').classList.toggle('menu-open'); }
+const menuGo = id => { hist = []; go(id, true); };
+const openProfile = () => menuGo('profilePage'), openRoutine = () => menuGo('routinePage'), openHeatloss = () => menuGo('dashboardPage'), openRiksa = () => menuGo('riksaPage'), openSimulasi = () => menuGo('simulasiPage'), openAssessment = () => menuGo('assessmentPage');
+const INNOV = {'Boiler Efficiency':'boilerEfficiencyPage','Sistem Lapor!!!':'sistemLaporPage','BI SMART':'biSmartPage','MATA SMART':'mataSmartPage','Dashboard SI':'dashSIPage'};
+const openInnovation = n => INNOV[n] && menuGo(INNOV[n]);
+const LOGO = '<div class="header-left" onclick="goToWelcome()"><img src="https://lh3.googleusercontent.com/d/1CwBi7j323RQBIhBoSBpREdp4qNuREx6F=w100" alt="Logo"><h1>Service &amp; Inspection</h1></div>';
+
+function navHTML(a) {
+  const c = k => 'menu-btn' + (a === k ? ' active' : '');
+  return '<button class="' + c('profile') + '" onclick="openProfile()">Profile</button><button class="' + c('routine') + '" onclick="openRoutine()">Inspection</button>'
+    + '<div class="dropdown"><button class="' + c('monitoring') + '">Monitoring</button><div class="dropdown-content"><button onclick="openHeatloss()">Heatloss</button><button onclick="openRiksa()">Riksa Uji</button><button onclick="openSimulasi()">Simulasi Darurat</button><button onclick="openAssessment()">Assessment</button></div></div>'
+    + '<div class="dropdown"><button class="' + c('innovation') + '">Innovation</button><div class="dropdown-content"><button onclick="openInnovation(\'Boiler Efficiency\')">Boiler Efficiency</button><button onclick="openInnovation(\'Sistem Lapor!!!\')">Sistem Lapor!!!</button><button onclick="openInnovation(\'BI SMART\')">Aplikasi BI SMART</button><button onclick="openInnovation(\'MATA SMART\')">Aplikasi MATA SMART</button><button onclick="openInnovation(\'Dashboard SI\')">Dashboard Service &amp; Inspection</button></div></div>';
+}
+document.querySelectorAll('[data-nav]').forEach(el => {
+  const a = el.dataset.nav;
+  if (!el.classList.contains('header')) { el.innerHTML = navHTML(a); return; }
+  el.innerHTML = LOGO + (a === 'back' ? '<button class="back-btn" onclick="goBack()">‹ Back</button>'
+    : '<button class="burger" onclick="toggleMenu(this)" aria-label="Menu">☰</button><div class="header-right">' + navHTML(a) + '</div>');
+});
+document.addEventListener('click', e => {
+  const d = e.target.closest('.dropdown');
+  document.querySelectorAll('.dropdown.open').forEach(x => x !== d && x.classList.remove('open'));
+  if (d) { if (e.target.closest('.dropdown-content')) d.classList.remove('open'); else d.classList.toggle('open'); }
+  const s = e.target.closest('[data-sum]');
+  if (s) { e.preventDefault(); goToSummary(s.dataset.sum); return; }
+  const a = e.target.closest('[data-act]');
+  if (a) openDetail(a.dataset.act, a.dataset.p, a.dataset.b);
+});
+
+/* ===== CHART & TABEL ===== */
+const CH = {};
+const cls = s => { s = String(s || '').toLowerCase(); return s.includes('hampir') ? 'warn' : (s.includes('expired') || s.includes('not yet')) ? 'bad' : (s.includes('aktif') || s.includes('done')) ? 'ok' : 'none'; };
+const COL = {ok:'#22c55e', warn:'#f59e0b', bad:'#ef4444', none:'#cbd5e1'};
+if (window.Chart) {
+  Chart.defaults.font.family = "'Inter',system-ui,sans-serif";
+  Chart.defaults.color = '#667085';
+  if (window['chartjs-plugin-annotation']) Chart.register(window['chartjs-plugin-annotation']);
+}
+function donut(id, labels, vals) {
+  if (CH[id]) CH[id].destroy();
+  const cv = $(id); if (!cv || !window.Chart) return;
+  const cols = labels.map(l => COL[cls(l)]);
+  CH[id] = new Chart(cv, {type:'doughnut', data:{labels, datasets:[{data:vals, backgroundColor:cols, borderWidth:0, borderRadius:8, spacing:3, hoverOffset:6}]},
+    options:{responsive:true, maintainAspectRatio:false, cutout:'76%', plugins:{legend:{display:false}}}});
+  $(id + 'T').textContent = vals.reduce((a, b) => a + b, 0);
+  $(id + 'L').innerHTML = labels.map((l, i) => '<span><i style="background:' + cols[i] + '"></i>' + esc(l) + '<b>' + vals[i] + '</b></span>').join('');
+}
+const sumLink = s => s ? '<a href="#" data-sum="' + esc(s) + '">' + esc(s) + '</a>' : '';
+const pill = (s, act, p, b) => '<span class="pill p-' + cls(s) + '"' + (act ? ' data-act="' + act + '" data-p="' + esc(p) + '" data-b="' + esc(b) + '"' : '') + '>' + esc(s) + '</span>';
+function rows(data, o) {
+  const nat = (a, b) => String(a || '').localeCompare(String(b || ''), 'id', {numeric:true});
+  const L = data.map((d, i) => ({d, i})).sort((a, b) => nat(a.d.psm, b.d.psm) || nat(a.d.pabrik, b.d.pabrik) || a.i - b.i).map(x => x.d);
+  const U = s => o.upper ? String(s || '').toUpperCase() : s;
+  const same = (x, y, pab) => String(x.psm || '') === String(y.psm || '') && (!pab || String(x.pabrik) === String(y.pabrik));
+  const cnt = {};
+  let h = '';
+  L.forEach((r, i) => {
+    cnt[r.status] = (cnt[r.status] || 0) + 1;
+    const span = pab => { let n = 1; while (i + n < L.length && same(L[i + n], r, pab)) n++; return n; };
+    const newPsm = i === 0 || !same(L[i - 1], r, false);
+    const newPab = newPsm || !same(L[i - 1], r, true);
+    h += '<tr>' + (newPsm ? '<td rowspan="' + span(false) + '">' + sumLink(U(r.psm)) + '</td>' : '')
+      + (newPab ? '<td rowspan="' + span(true) + '">' + sumLink(U(r.pabrik)) + '</td>' : '')
+      + '<td>' + esc(r.boiler) + '</td>' + (o.date ? '<td>' + esc(r.tanggal) + '</td>' : '') + '<td>' + pill(r.status, o.act, r.pabrik, r.boiler) + '</td></tr>';
+  });
+  return {h, cnt};
+}
+function fill(tbId, cols, data, o, chartId) {
+  const tb = $(tbId);
+  if (!data || !data.length) { tb.innerHTML = '<tr><td colspan="' + cols + '">Tidak ada data</td></tr>'; donut(chartId, [], []); return; }
+  const r = rows(data, o);
+  tb.innerHTML = r.h; donut(chartId, Object.keys(r.cnt), Object.values(r.cnt));
+}
+SHOW.dashboardPage = () => gs('getHeatlossData', [], d => fill('tableBody', 5, d, {date:1, act:'heatloss'}, 'donutChart'));
+SHOW.riksaPage = () => gs('getRiksaUjiData', [], d => fill('tableBodyRiksa', 5, d, {date:1, act:'riksa'}, 'donutChartRiksa'));
+let SIMD = [];
+const simPill = s => !s.has ? '<span class="pill p-none">—</span>' : '<span class="pill p-' + cls(s.status) + '">' + esc(s.tgl || 'Ada') + '</span>';
+function renderSim(data) {
+  SIMD = (data || []).slice().sort((a, b) => String(a.psm).localeCompare(String(b.psm), 'id', {numeric:true}) || String(a.pabrik).localeCompare(String(b.pabrik), 'id', {numeric:true}));
+  const tb = $('tableBodySim');
+  if (!SIMD.length) { tb.innerHTML = '<tr><td colspan="6">Tidak ada data</td></tr>'; donut('donutChartSim', [], []); return; }
+  const cnt = {};
+  tb.innerHTML = SIMD.map((d, i) => {
+    [d.s1, d.s2].forEach(s => cnt[s.status] = (cnt[s.status] || 0) + 1);
+    const ik = d.peserta.filter(p => p.ikut).length, n = d.peserta.length;
+    const pc = ik === 0 ? 'bad' : ik === n ? 'ok' : 'warn';
+    const nP = i === 0 || String(SIMD[i - 1].psm) !== String(d.psm);
+    let sp = 1; while (i + sp < SIMD.length && String(SIMD[i + sp].psm) === String(d.psm)) sp++;
+    return '<tr onclick="simDetail(' + i + ')">' + (nP ? '<td rowspan="' + sp + '" onclick="event.stopPropagation()"><b>' + esc(d.psm || '-') + '</b></td>' : '') + '<td><b>' + esc(d.pabrik) + '</b></td><td>' + simPill(d.s1) + '</td><td>' + simPill(d.s2) + '</td><td>'
+      + d.kondisi.map(k => '<i class="sd ' + (k.ok ? 'ok' : 'no') + '" title="' + esc(k.nama) + '">' + (k.ok ? '✓' : '✕') + '</i>').join('')
+      + '</td><td><div class="pbar"><i class="b-' + pc + '" style="width:' + (n ? Math.round(ik * 100 / n) : 0) + '%"></i></div><span class="pn">' + ik + ' / ' + n + ' peserta</span></td></tr>';
+  }).join('');
+  donut('donutChartSim', Object.keys(cnt), Object.values(cnt));
+  const lb = $('donutChartSimT').nextElementSibling; if (lb) lb.textContent = 'Total shift';
+}
+function simDetail(i) {
+  const d = SIMD[i]; if (!d) return;
+  $('apm').className = 'on ap-bi';
+  $('apm').innerHTML = '<div class="apc"><button onclick="apClose()">✕</button><h3>' + esc(d.pabrik) + (d.psm ? ' · ' + esc(d.psm) : '') + '</h3>'
+    + '<div class="sdm-shifts"><div><small>Shift 1</small>' + simPill(d.s1) + '</div><div><small>Shift 2</small>' + simPill(d.s2) + '</div></div>'
+    + '<h4>Kondisi simulasi</h4>' + d.kondisi.map(k => '<div class="sdm-row"><i class="sd ' + (k.ok ? 'ok' : 'no') + '">' + (k.ok ? '✓' : '✕') + '</i><span>' + esc(k.nama) + '</span><em>' + esc(k.tgl) + '</em></div>').join('')
+    + '<h4 style="margin-top:14px">Peserta</h4><div class="sdm-chips">' + d.peserta.map(p => '<span class="' + (p.ikut ? 'on' : '') + '">' + esc(p.nama) + '</span>').join('') + '</div><div style="margin-top:18px"><button class="save-btn" style="width:100%" onclick="apClose();openSimUpdate(SIMD[' + i + '].pabrik)">Update simulasi pabrik ini</button></div></div>';
+}
+SHOW.simulasiPage = () => gs('getSimulasiData', [], d => renderSim(d || []));
+
+/* ===== UPDATE SIMULASI: login + pertanyaan (alur BI SMART) ===== */
+const SU = { shift:'1', kondisi:new Set(), peserta:new Set(), want:'' };
+const suToday = () => { const d = new Date(), z = n => ('0' + n).slice(-2); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+const suNote = (id, type, text) => { const e = $(id); e.className = 'su-msg ' + type; e.textContent = text; e.style.display = text ? 'block' : 'none'; };
+function openSimUpdate(pabrik) { SU.want = pabrik || ''; go('simulasiUpdatePage'); }
+SHOW.simulasiUpdatePage = () => suRender();
+
+function suRender() {
+  const ok = !!localStorage.getItem('userToken');
+  $('suLoginCard').style.display = ok ? 'none' : '';
+  $('suForm').style.display = ok ? '' : 'none';
+  $('suSub').textContent = ok ? 'Jawab pertanyaan berikut untuk memperbarui data simulasi.' : 'Masuk terlebih dahulu untuk memperbarui data simulasi.';
+  $('suWho').textContent = localStorage.getItem('uploadEmail') || '';
+  suNote('suMsg', '', '');
+  if (ok) suBuild();
+}
+function suDoLogin() {
+  const u = $('suUser').value.trim(), e = $('suEmail').value.trim().toLowerCase(), p = $('suPass').value, b = $('suLoginBtn');
+  if (!u || !e || !p) return suNote('suLoginMsg', 'err', 'Username, email, dan password wajib diisi.');
+  b.disabled = true; b.textContent = 'Memeriksa...'; suNote('suLoginMsg', '', '');
+  const done = () => { b.disabled = false; b.textContent = 'Masuk'; };
+  gs('authenticate', [u, p, e], r => {
+    done();
+    if (r && r.success) { localStorage.setItem('userToken', r.token); localStorage.setItem('uploadEmail', r.email || ''); $('suPass').value = ''; suRender(); }
+    else suNote('suLoginMsg', 'err', (r && r.message) || 'Login gagal.');
+  }, err => { done(); suNote('suLoginMsg', 'err', 'Login gagal: ' + err.message); });
+}
+function suLogout() {
+  const t = localStorage.getItem('userToken'); if (t) gs('invalidateToken', [t]);
+  localStorage.removeItem('userToken'); localStorage.removeItem('uploadEmail'); suRender();
+}
+function suBuild() {
+  const run = () => {
+    const d = SIMD, sel = $('suPabrik'), want = SU.want || sel.value;
+    sel.innerHTML = d.map(x => '<option>' + esc(x.pabrik) + '</option>').join('');
+    if (want && d.some(x => x.pabrik === want)) sel.value = want;
+    const k = d[0] ? d[0].kondisi : [], p = d[0] ? d[0].peserta : [];
+    SU.kondisi.clear(); SU.peserta.clear(); SU.shift = '1';
+    document.querySelectorAll('.su-seg button').forEach((b, i) => b.classList.toggle('on', i === 0));
+    $('suKondisi').innerHTML = k.map((x, i) => '<button type="button" class="su-chip" onclick="suTog(\'kondisi\',' + i + ',this)">' + esc(x.nama) + '</button>').join('');
+    $('suPeserta').innerHTML = p.map((x, i) => '<button type="button" class="su-chip" onclick="suTog(\'peserta\',' + i + ',this)">' + esc(x.nama) + '</button>').join('');
+    $('suTgl').value = suToday(); $('suTgl').max = suToday();
+    $('suFoto').value = ''; $('suBA').value = '';
+    suHint(); suLog();
+  };
+  if (SIMD.length) run(); else gs('getSimulasiData', [], d => { renderSim(d || []); run(); });
+}
+function suTog(k, i, el) { const s = SU[k]; if (s.has(i)) s.delete(i); else s.add(i); el.classList.toggle('on', s.has(i)); }
+function suAll() {
+  const els = [...$('suPeserta').children], all = SU.peserta.size < els.length;
+  SU.peserta.clear();
+  els.forEach((b, i) => { if (all) SU.peserta.add(i); b.classList.toggle('on', all); });
+}
+function suShift(n, el) { SU.shift = n; [...el.parentNode.children].forEach(b => b.classList.toggle('on', b === el)); suHint(); }
+function suHint() {
+  const d = SIMD.find(x => x.pabrik === $('suPabrik').value), s = d && d['s' + SU.shift];
+  $('suHint').innerHTML = s && s.has ? 'Simulasi terakhir: <b>' + esc(s.tgl || 'tercatat') + '</b> · ' + esc(s.status) : 'Belum ada data simulasi untuk shift ini.';
+}
+function suLog() {
+  const p = $('suPabrik').value, tb = $('suLogBody');
+  if (!p) { tb.innerHTML = '<tr><td colspan="5">Pilih pabrik</td></tr>'; return; }
+  gs('getUploadedFiles', [p, '', 'Simulasi'], d => {
+    d = d || [];
+    tb.innerHTML = d.length ? d.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + esc(r.timestamp) + '</td><td>' + esc(r.uploader) + '</td><td>' + esc(r.tanggalLaporan) + '</td><td>'
+      + (r.url && /^https?:/i.test(r.url) ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.fileName) + '</a>' : '-') + '</td></tr>').join('')
+      : '<tr><td colspan="5">Belum ada riwayat update</td></tr>';
+  });
+}
+const suRead = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res({name:f.name, mime:f.type, data:String(r.result).split(',')[1]}); r.onerror = rej; r.readAsDataURL(f); });
+async function suSubmit(btn) {
+  const bad = t => suNote('suMsg', 'err', t);
+  const pabrik = $('suPabrik').value, tgl = $('suTgl').value;
+  const fotos = [...$('suFoto').files], ba = $('suBA').files[0];
+  if (!pabrik) return bad('Pilih pabrik terlebih dahulu.');
+  if (!tgl) return bad('Isi tanggal simulasi.');
+  if (tgl > suToday()) return bad('Tanggal simulasi tidak boleh di masa depan.');
+  if (!SU.kondisi.size) return bad('Pilih minimal 1 kondisi yang disimulasikan.');
+  if (!SU.peserta.size) return bad('Pilih minimal 1 peserta.');
+  if (fotos.length > 3) return bad('Maksimal 3 foto.');
+  if (fotos.some(f => !/^image\/(jpeg|png|webp)$/.test(f.type) || f.size > 4 * 1024 * 1024)) return bad('Foto harus JPG/PNG/WEBP dan maksimal 4 MB per foto.');
+  if (ba && (ba.type !== 'application/pdf' || ba.size > 10 * 1024 * 1024)) return bad('Berita Acara harus PDF dan maksimal 10 MB.');
+  const token = localStorage.getItem('userToken');
+  if (!token) { suRender(); return; }
+  suNote('suMsg', '', '');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const reset = () => { btn.disabled = false; btn.textContent = 'Save Update Simulasi'; };
+  gs('verifyUploadToken', [token], async ok => {
+    if (!ok) { reset(); localStorage.removeItem('userToken'); suRender(); return; }
+    try {
+      const foto = await Promise.all(fotos.map(suRead)), baF = ba ? await suRead(ba) : null;
+      const payload = { pabrik, shift:SU.shift, tanggal:tgl, kondisi:[...SU.kondisi], peserta:[...SU.peserta], ba:baF, foto };
+      gs('saveSimulasi', [payload, token], res => {
+        reset();
+        if (res && res.success) {
+          gs('getSimulasiData', [], d => { renderSim(d || []); SU.want = pabrik; suBuild(); suNote('suMsg', 'ok', res.message); });
+        } else bad((res && res.message) || 'Gagal Save.');
+      }, err => { reset(); bad('Gagal: ' + err.message); });
+    } catch (e) { reset(); bad('Gagal membaca file.'); }
+  }, err => { reset(); bad('Gagal verifikasi sesi: ' + err.message); });
+}
+SHOW.routinePage = () => gs('getRoutineInspectionData', [], d => fill('tableBodyRoutine', 4, d, {}, 'donutChartRoutine'));
+
+/* ===== SUMMARY ===== */
+function goToSummary(name) {
+  name = String(name || '').trim();
+  if (!name) return alert('Nama PSM/pabrik tidak ditemukan.');
+  go('summaryPage');
+  $('summaryTitle').textContent = 'Summary Data: ' + (/^\d+$/.test(name) ? 'PSM ' + name : name);
+  ['Routine','Heatloss','Riksa'].forEach(k => $('summaryTableBody' + k).innerHTML = '<tr><td colspan="4">⏳ Loading...</td></tr>');
+  gs('getSummaryData', [name], renderSummary);
+}
+function renderSummary(d) {
+  [['Routine','routine',null],['Heatloss','heatloss','heatloss'],['Riksa','riksa','riksa']].forEach(([K, key, act]) => {
+    const blk = d && d[key] || {}, data = blk.tableData || [], ch = blk.chartData || {labels:[], datasets:[]};
+    donut('summaryChart' + K, ch.labels || [], (ch.datasets[0] || {data:[]}).data);
+    $('summaryTableBody' + K).innerHTML = data.length ? rows(data, {upper:1, act}).h : '<tr><td colspan="4">Tidak ada data</td></tr>';
+  });
+}
+
+/* ===== LOGIN ===== */
+function showUploaderLogin() {
+  ['loginUsername','loginEmail','loginPassword'].forEach(i => $(i).value = '');
+  $('loginMsg').textContent = ''; $('uploaderLoginModal').style.display = 'flex';
+}
+function closeUploaderLogin() { $('uploaderLoginModal').style.display = 'none'; $('loginMsg').textContent = ''; pending = null; }
+function doUploaderLogin() {
+  const u = $('loginUsername').value.trim(), p = $('loginPassword').value, e = $('loginEmail').value.trim().toLowerCase();
+  const msg = $('loginMsg'), btn = $('uploaderLoginButton');
+  msg.textContent = '';
+  if (!u || !p || !e) { msg.textContent = 'Semua kolom (Username, Email, Password) harus diisi.'; return; }
+  btn.disabled = true; btn.textContent = 'Memeriksa...';
+  const done = () => { btn.disabled = false; btn.textContent = 'Login'; };
+  gs('authenticate', [u, p, e], r => {
+    done();
+    if (r && r.success) {
+      localStorage.setItem('userToken', r.token); localStorage.setItem('uploadEmail', r.email || '');
+      msg.style.color = '#15803d'; msg.textContent = 'Login berhasil!';
+      setTimeout(() => { const f = pending; $('uploaderLoginModal').style.display = 'none'; msg.style.color = ''; msg.textContent = ''; pending = null; if (f) f(); }, 500);
+    } else msg.textContent = (r && r.message) || 'Login gagal.';
+  }, err => { done(); msg.textContent = 'Login gagal: ' + err.message; });
+}
+let logoutTimer;
+function startAutoLogout() { clearTimeout(logoutTimer); logoutTimer = setTimeout(performAutoLogout, 24 * 3600 * 1000); }
+function performAutoLogout() {
+  const t = localStorage.getItem('userToken');
+  if (t) gs('invalidateToken', [t]);
+  localStorage.removeItem('userToken'); localStorage.removeItem('uploadEmail');
+  alert('Sesi Anda telah berakhir. Silakan login kembali.'); goToWelcome();
+}
+['click','keypress','scroll'].forEach(ev => document.addEventListener(ev, startAutoLogout, {passive:true}));
+
+/* ===== DETAIL ===== */
+const XLS = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+const CFG = {
+  heatloss:{page:'detailHeatlossPage', get:'getHeatlossDetail', type:'Heatloss', body:'detailHeatlossBody', log:'uploadedFilesHeatlossList', date:'heatlossTanggalBaru', file:'heatlossFilePendukung', accept:'.pdf,.xls,.xlsx', mimes:['application/pdf'].concat(XLS)},
+  riksa:{page:'detailRiksaPage', get:'getRiksaDetail', type:'Riksa', body:'detailRiksaBody', log:'uploadedFilesRiksaList', date:'riksaTanggalBaru', file:'riksaFilePendukung', accept:'.pdf', mimes:['application/pdf']}
+};
+function openDetail(kind, p, b) {
+  const c = CFG[kind]; if (!c) return;
+  if (!localStorage.getItem('userToken')) { alert('Silakan login terlebih dahulu untuk membuka detail.'); pending = () => openDetail(kind, p, b); showUploaderLogin(); return; }
+  c.p = p; c.b = b; go(c.page);
+  $(c.body).innerHTML = '<tr><td colspan="7">⏳ Loading...</td></tr>';
+  gs(c.get, [p, b], d => renderDetail(kind, d));
+  gs('getUploadedFiles', [p, b, c.type], d => renderLog(kind, d || []));
+}
+function renderDetail(kind, data) {
+  const c = CFG[kind], tb = $(c.body);
+  if (!data || !data.length) { tb.innerHTML = '<tr><td colspan="7">Tidak ada data detail</td></tr>'; return; }
+  const r = data[0];
+  tb.innerHTML = '<tr><td>' + sumLink(r.psm) + '</td><td>' + sumLink(r.pabrik) + '</td><td>' + esc(r.boiler) + '</td><td>' + esc(r.tanggal) + '</td><td>' + pill(r.status) + '</td>'
+    + '<td><input type="date" id="' + c.date + '" value="' + esc(r.tanggalBaru) + '"></td><td><input type="file" id="' + c.file + '" accept="' + c.accept + '">'
+    + (/^https?:/i.test(r.file) ? '<br><a href="' + esc(r.file) + '" target="_blank" rel="noopener">Download file terakhir</a>' : '') + '</td></tr>';
+}
+function renderLog(kind, data) {
+  $(CFG[kind].log).innerHTML = data.length ? data.map((r, i) => '<tr><td>' + (i + 1) + '</td><td>' + esc(r.timestamp) + '</td><td>' + esc(r.uploader) + '</td><td>' + esc(r.tanggalLaporan) + '</td><td>'
+    + (r.url && /^https?:/i.test(r.url) ? '<a href="' + esc(r.url) + '" target="_blank" rel="noopener">' + esc(r.fileName) + '</a>' : '-') + '</td></tr>').join('')
+    : '<tr><td colspan="5">Belum ada riwayat upload</td></tr>';
+}
+function saveDetailFile(kind, btn) {
+  const c = CFG[kind], dEl = $(c.date), fEl = $(c.file);
+  if (!dEl || !fEl) return alert('Data detail belum termuat.');
+  const tgl = dEl.value, f = fEl.files[0];
+  if (!tgl) return alert('Mohon isi tanggal terlebih dahulu.');
+  if (!f) return alert('Mohon upload file pendukung.');
+  if (!c.mimes.includes(f.type)) return alert('Format file tidak valid. Hanya ' + c.accept.replace(/\./g, '').replace(/,/g, ', ').toUpperCase() + '.');
+  if (f.size > 10 * 1024 * 1024) return alert('Ukuran file terlalu besar (maksimal 10 MB).');
+  const token = localStorage.getItem('userToken');
+  if (!token) { pending = null; showUploaderLogin(); return alert('Silakan login terlebih dahulu sebelum save file.'); }
+  btn.disabled = true; const old = btn.textContent; btn.textContent = 'Uploading...';
+  const reset = () => { btn.disabled = false; btn.textContent = old; };
+  gs('verifyUploadToken', [token], ok => {
+    if (!ok) { reset(); localStorage.removeItem('userToken'); alert('Sesi Anda sudah berakhir. Silakan login kembali.'); showUploaderLogin(); return; }
+    const rd = new FileReader();
+    rd.onload = ev => gs('saveDetail', [c.p, c.b, tgl, f.name, ev.target.result.split(',')[1], f.type, c.type, token], res => {
+      reset();
+      if (res && res.success) { alert('Data berhasil di-save dan file berhasil di-upload!'); setTimeout(() => openDetail(kind, c.p, c.b), 1500); }
+      else alert('Gagal save data: ' + ((res && res.message) || 'tidak diketahui'));
+    }, err => { reset(); console.error(err); alert('Terjadi kesalahan saat save data.'); });
+    rd.readAsDataURL(f);
+  }, err => { reset(); alert('Gagal verifikasi sesi: ' + err.message); });
+}
+
+/* ===== ASSESSMENT ===== */
+const F = ['sop','hidro','perawatan','gauge','abu','operasi','darurat'];
+const FL = ['SOP PMKS Stasiun Boiler & Power','IK Uji Hidrostatis Boiler','IK Perawatan Boiler','IK Pengujian Gauge Glass','IK Pembersihan Abu Boiler','IK Operasional Boiler','IK Keadaan Darurat Boiler'];
+const AC = ['#0f2e22','#1f7a56','#5bb88a','#c8a24a','#a7d7bd','#14573f','#cbd5e1'];
+const EX = ['TDKB','BLTB','LBNB','MLKB','BGNB','TKRB','PMTB','KDWB','DMTB','BDUB'];
+let AS = [], asChart = null;
+SHOW.assessmentPage = () => gs('getAssessmentData', [], renderAssessment);
+function renderAssessment(data) {
+  AS = (data || []).map(r => {
+    const n = r.nilai || {}, nilai = {};
+    F.forEach(f => nilai[f] = Number(n[f]) || 0);
+    return Object.assign({}, r, {periode:String(r.periode || ''), gar:String(r.gar || '').toUpperCase(), psm:String(r.psm || '').toUpperCase(), pabrik:String(r.pabrik || '').toUpperCase(), nilai});
+  });
+  [['filterGar','gar'],['filterPsm','psm'],['filterPabrik','pabrik']].forEach(([id, k]) => {
+    const s = $(id), v = s.value;
+    s.innerHTML = '<option value="">Semua ' + k.toUpperCase() + '</option>' + [...new Set(AS.map(d => d[k]).filter(Boolean))].sort().map(x => '<option>' + esc(x) + '</option>').join('');
+    s.value = v; s.onchange = updateAssessment;
+  });
+  updateAssessment();
+}
+function updateAssessment() {
+  const g = $('filterGar').value, p = $('filterPsm').value, b = $('filterPabrik').value;
+  const fl = AS.filter(d => (!g || d.gar === g) && (!p || d.psm === p) && (!b || d.pabrik === b));
+  const per = [...new Set(fl.map(d => d.periode).filter(Boolean))].sort();
+  if (asChart) { asChart.destroy(); asChart = null; }
+  if (!per.length) { $('avgBox').textContent = '-'; return; }
+  const ds = per.map((pr, i) => { const R = fl.filter(r => r.periode === pr); return {label:pr, data:F.map(f => R.reduce((s, r) => s + r.nilai[f], 0) / R.length), backgroundColor:AC[i % AC.length], borderRadius:6, borderSkipped:false, maxBarThickness:26}; });
+  if (window.Chart) asChart = new Chart($('assessmentChart'), {type:'bar', data:{labels:FL, datasets:ds}, options:{responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{position:'top', align:'end', labels:{usePointStyle:true, pointStyle:'circle', boxWidth:8}}, annotation:{annotations:{batas90:{type:'line', yMin:90, yMax:90, borderColor:'#ef4444', borderWidth:1.5, borderDash:[5,5], label:{display:true, content:'Batas lulus 90', position:'start', backgroundColor:'#ef4444', color:'#fff', font:{size:11}}}}}},
+    scales:{x:{grid:{display:false}, border:{display:false}, ticks:{font:{size:11, weight:600}, callback(v) { const w = this.getLabelForValue(v).split(' '), l = []; while (w.length) l.push(w.splice(0, 3).join(' ')); return l; }}},
+      y:{beginAtZero:true, max:100, grid:{color:'#f0f1f4'}, border:{display:false}}}}});
+  const avgR = r => F.reduce((s, f) => s + r.nilai[f], 0) / F.length;
+  const last = per[per.length - 1], LT = fl.filter(r => r.periode === last);
+  $('avgBox').textContent = (LT.reduce((s, r) => s + avgR(r), 0) / LT.length).toFixed(1);
+  const all = [...new Set(AS.map(r => r.periode).filter(Boolean))].sort(), lp = all[all.length - 1], pv = all[all.length - 2], cur = AS.filter(r => r.periode === lp);
+  const grp = k => { const m = {}; cur.forEach(r => { const key = r[k] || 'UNKNOWN', x = m[key] = m[key] || {s:0, n:0}; x.s += avgR(r); x.n++; }); return Object.entries(m).map(([key, v]) => ({key, avg:v.s / v.n, n:v.n})); };
+  const best = (a, f) => a.slice().sort((x, y) => f(y) - f(x))[0];
+  const bp = best(grp('psm'), x => x.avg), bf = best(grp('pabrik'), x => x.avg), tp = best(grp('psm'), x => x.n), tf = best(grp('pabrik'), x => x.n);
+  $('bestPsm').textContent = bp ? bp.key + ' (' + bp.avg.toFixed(1) + ')' : '-';
+  $('bestPabrik').textContent = bf ? bf.key + ' (' + bf.avg.toFixed(1) + ')' : '-';
+  $('aktifPsm').textContent = tp ? tp.key + ' (' + tp.n + ' Peserta)' : '-';
+  $('aktifPabrik').textContent = tf ? tf.key + ' (' + tf.n + ' Peserta)' : '-';
+  let h = '<li>Data periode belum cukup.</li>';
+  if (pv) {
+    const a = new Set(AS.filter(r => r.periode === pv).map(r => r.pabrik)), c = new Set(cur.map(r => r.pabrik));
+    const m = [...a].filter(x => !c.has(x) && !EX.includes(x));
+    h = m.length ? m.map(x => '<li>' + esc(x) + '</li>').join('') : '<li>Semua pabrik sudah melakukan assessment.</li>';
   }
-  pushing=0;lastAct=Date.now(); // beri jeda 4 detik agar cache server segar sebelum polling lagi
-}
-function pt(id,t){const m=S.matches.find(x=>x.id==id),s=ST(m)||fresh();if(m.refereeUid!=U.id||s.d)return;const n=step(R(m),s,t);n.h=(s.h||[]).concat([snap(s)]).slice(-40);m.st=JSON.stringify(n);if(n.d)m.status='done';push(m)}
-function finish(id){
-  const m=S.matches.find(x=>x.id==id),s=m&&ST(m);if(!m||!s||m.refereeUid!=U.id||s.d)return;
-  const r=R(m),hs=hasSets(r),bd=r.t=='badminton';
-  if(!confirm('Akhiri pertandingan sekarang? Pemenang ditentukan dari skor saat ini.'))return;
-  const n=snap(s);
-  if(hs&&(n.g[0]+n.g[1])>0)n.sh=(n.sh||[]).concat([[n.g[0],n.g[1]]]);
-  let a,b;
-  if(bd){a=n.p[0];b=n.p[1]}
-  else if(hs){a=n.s[0];b=n.s[1];if(a==b){a=0;b=0;(n.sh||[]).forEach(x=>{a+=x[0];b+=x[1]})}}
-  else{a=n.g[0];b=n.g[1]}
-  n.d=1;n.w=a==b?-1:a>b?0:1;
-  n.h=(s.h||[]).concat([snap(s)]).slice(-40);
-  m.st=JSON.stringify(n);m.status='done';push(m)}
-function un(id){const m=S.matches.find(x=>x.id==id),s=ST(m);if(m.refereeUid!=U.id||!s||!(s.h||[]).length)return;const h=s.h.slice(),p=h.pop();p.h=h;m.st=JSON.stringify(p);m.status=p.d?'done':'live';push(m)}
-function fixForm(id){
-  const m=S.matches.find(x=>x.id==id),r=R(m),s=ST(m)||fresh(),bd=r.t=='badminton',hs=hasSets(r),tb=!!s.tb;
-  let pa=s.p[0],pb=s.p[1];if(!bd&&!tb&&pa>=3&&pb>=3){const d=pa-pb;pa=3+Math.max(d,0);pb=3+Math.max(-d,0)}const pv=[pa,pb];
-  const pf=t=>(bd||tb)?`<input id="fp${t}" type="number" min="0" class="i" value="${s.p[t]}">`:`<select id="fp${t}" class="i">${['0','15','30','40','AD'].map((x,i)=>`<option value="${i}" ${pv[t]==i?'selected':''}>${x}</option>`).join('')}</select>`;
-  const box=t=>`<div class="space-y-1"><div class="text-xs font-bold text-orange-400 uppercase truncate">${esc(t?m.teamB:m.teamA)}</div><label class="text-[10px] text-zinc-400 uppercase">Poin${tb?' (tie-break)':''}</label>${pf(t)}
-   ${bd?'':`<label class="text-[10px] text-zinc-400 uppercase">Game</label><input id="fg${t}" type="number" min="0" class="i" value="${s.g[t]}">`}
-   ${hs?`<label class="text-[10px] text-zinc-400 uppercase">Set</label><input id="fs${t}" type="number" min="0" class="i" value="${s.s[t]}">`:''}</div>`;
-  modal(`<h3 class="font-black uppercase">Koreksi Skor</h3><p class="text-xs text-zinc-400">Atur skor langsung jika salah input (mis. poin masuk ke tim yang salah). Bisa juga pakai tombol Undo lalu tekan tim yang benar.</p><div class="grid grid-cols-2 gap-3">${box(0)}${box(1)}</div>
-  <div class="flex justify-end gap-2 pt-2"><button class="g" onclick="closeM()">Batal</button><button class="b" onclick="applyFix('${id}')">Save</button></div>`);
-}
-function applyFix(id){
-  const m=S.matches.find(x=>x.id==id),r=R(m),s=ST(m)||fresh(),n=snap(s),v=k=>[+($('#'+k+'0')||{value:0}).value||0,+($('#'+k+'1')||{value:0}).value||0];
-  n.p=v('fp');if(r.t!='badminton')n.g=v('fg');if(hasSets(r))n.s=v('fs');n.d=0;n.w=-1;
-  n.tb=(r.t=='padel'&&+r.sets>0&&n.g[0]==6&&n.g[1]==6&&(s.tb||n.p[0]+n.p[1]>0&&false))?1:(s.tb&&n.g[0]==6&&n.g[1]==6?1:0);
-  if(r.t=='padel'&&!(+r.sets>0)){const N=+r.n,t=n.g[0]+n.g[1];if(n.g[0]*2>N||n.g[1]*2>N||t>=N){n.d=1;n.w=n.g[0]==n.g[1]?-1:n.g[0]>n.g[1]?0:1}}
-  else if(hasSets(r)){const need=Math.ceil(+r.sets/2);[0,1].forEach(t=>{if(n.s[t]>=need){n.d=1;n.w=t}})}
-  else if(Math.max(...n.p)>=21){n.d=1;n.w=n.p[0]>=n.p[1]?0:1}
-  n.h=(s.h||[]).concat([snap(s)]).slice(-40);m.st=JSON.stringify(n);m.status=n.d?'done':'live';closeM();push(m)}
-
-// ---------- ATLET ----------
-function players(){
-  const L=rank('all');
-  $('#v').innerHTML=`<h2 class="text-2xl font-black uppercase">Atlet & Kerabat</h2>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">${L.map(p=>`<div class="c p-4 space-y-3"><div class="flex items-center gap-3">
-  <div class="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center font-black">${esc(p.name[0]||'?').toUpperCase()}</div>
-  <div class="overflow-hidden"><h4 class="font-bold text-sm truncate">${esc(p.name)}</h4></div></div>
-  <div class="grid grid-cols-3 text-center text-xs bg-zinc-900/50 rounded-xl p-2"><div><span class="block text-zinc-500">Main</span><b>${p.m}</b></div><div><span class="block text-zinc-500">Menang</span><b class="text-emerald-400">${p.w}</b></div><div><span class="block text-zinc-500">Poin</span><b>${p.pt}</b></div></div></div>`).join('')}</div>`;
+  $('missingList').innerHTML = h;
 }
 
-// ---------- PROFILE ----------
-async function renameMe(){
-  const n=prompt('Nama tampilan (dipakai untuk nama tim otomatis):',U.name);if(n===null||!n.trim())return;
-  const r=await call('setName',{name:n.trim()});if(!r.ok)return toast(r.error);
-  U=r.user;localStorage.setItem('sahata_user',JSON.stringify(U));toast('Nama update');lastAct=0;boot()}
-function me(){
-  const p=rank('all').find(x=>x.id==U.id)||{pt:0,m:0,w:0};
-  const wr=+p.m?Math.round(p.w/p.m*100):0;
-  const H=S.matches.filter(m=>jp(m.memA).concat(jp(m.memB)).some(x=>x.u==U.id)).reverse();
-  $('#v').innerHTML=`<div class="c p-6 space-y-5"><div class="flex justify-between items-center gap-3"><div class="flex items-center gap-4">
-  <div class="w-16 h-16 rounded-2xl bg-orange-500 text-black font-black text-2xl flex items-center justify-center">${esc(U.name[0]).toUpperCase()}</div>
-  <div><h2 class="text-2xl font-black uppercase">${esc(U.name)}</h2><p class="text-xs text-zinc-400">${esc(U.email)}</p><button class="text-xs text-orange-400 font-bold mt-1" onclick="renameMe()">✎ Ubah nama</button></div></div><button class="g" onclick="logout()">Keluar</button></div>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">${[['Total Poin',p.pt,''],['Main',p.m,''],['Menang',p.w,'text-emerald-400'],['Rasio Menang',wr+'%','text-orange-400']].map(s=>`<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-4"><span class="text-xs text-zinc-400 uppercase font-bold">${s[0]}</span><div class="text-3xl font-black ${s[2]}">${s[1]}</div></div>`).join('')}</div>
-  <h3 class="text-sm font-extrabold uppercase">Riwayat Pertandingan Saya</h3>
-  ${H.map(m=>`<div onclick="go('live');openM('${m.id}')" class="cursor-pointer bg-zinc-900/40 border border-zinc-800 rounded-xl p-4 flex justify-between items-center"><div><div class="text-xs text-zinc-400">${esc(m.eventName)}</div><div class="font-bold text-sm">${esc(m.teamA)} vs ${esc(m.teamB)}</div></div><div class="text-xl font-black">${m.status=='upcoming'?'-':sm(m)}</div></div>`).join('')||'<p class="text-center text-zinc-500 text-xs py-4">Belum ada pertandingan tercatat.</p>'}</div>`;
+/* ===== BOILER EFFICIENCY ===== */
+let beSlide = false;
+SHOW.boilerEfficiencyPage = function () {
+  gs('getEfficiencyComparisonData', [], data => {
+    const st = $('beFetchStatus');
+    if (!data) { st.textContent = 'Data tidak tersedia.'; return; }
+    const d = data.filter(r => r[1]).map(r => ({l:r[1], b:+r[2] || 0, a:+r[3] || 0})).sort((x, y) => y.a - x.a);
+    if (CH.be) CH.be.destroy();
+    CH.be = new Chart($('beChart'), {type:'bar', data:{labels:d.map(x => x.l), datasets:[
+      {label:'Before (%)', data:d.map(x => x.b), backgroundColor:'#cbd5e1', borderRadius:6, borderSkipped:false, maxBarThickness:18},
+      {label:'After (%)', data:d.map(x => x.a), backgroundColor:'#1f7a56', borderRadius:6, borderSkipped:false, maxBarThickness:18}]},
+      options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'top', align:'end', labels:{usePointStyle:true, pointStyle:'circle', boxWidth:8}}},
+        scales:{x:{grid:{display:false}, border:{display:false}, ticks:{autoSkip:false, maxRotation:90}}, y:{beginAtZero:true, grid:{color:'#f0f1f4'}, border:{display:false}, title:{display:true, text:'Efisiensi (%)'}}}}});
+    st.style.display = 'none';
+  }, e => { $('beFetchStatus').textContent = 'Gagal Loading: ' + e.message; });
+  if (beSlide) return; beSlide = true;
+  const urls = ['1_1UkeJUJk_YAvrn39jQERA5DhIeTTY0k=w400','1lVB64gqbUhOpRzlgDN1KVWKIh_u3KYHZ=w300','1_SxLkHMzhKuYBRpUrfkVxBFcFNrOgacv=w1000','1Y755JwrRXJ0MISuN4rnzu_2VUsyXyHKw=w1000','1Dh6Kqw7gIJ-FjMly1Fv27izYNVx5IQ2I=w500'].map(u => 'https://lh3.googleusercontent.com/d/' + u);
+  urls.forEach(u => { new Image().src = u; });
+  const el = $('beImage'); let i = 0;
+  setInterval(() => {
+    if (CUR !== 'boilerEfficiencyPage') return;
+    el.style.opacity = 0;
+    setTimeout(() => { i = (i + 1) % urls.length; el.src = urls[i]; el.style.opacity = 1; }, 800);
+  }, 5000);
+};
+
+/* ===== PROFILE (carousel) ===== */
+const IMG = 'https://lh3.googleusercontent.com/d/';
+const PEOPLE = [
+  ['Arif Wigunarto','Head of Engineering',IMG+'11L5QoD8IK-8PxammFmz-8LS3oAn5hv6X','arif.wigunarto',[['Section',['Instrument Services','Electrical Inspection','Boiler Inspection','WTP Services']]]],
+    ['Dimas Tri Wicaksono','Manager Service & Inspection',IMG+'1Gyk7DnMIB5kp4Uf7TiP648MZUUu74kp9=s1024','dimas.tri.wicaksono',[['Section',['Instrument Services','Electrical Inspection','Boiler Inspection & WTP Services']]]],
+  ['Purnawan S Wardana','Lead Inspector / Senior Boiler Specialist',IMG+'1UKXzhihkYD7jaUvSb4ED5Q_rvj3o0Cql=s1024','purnawan.s.wardana',[['Spesialisasi',['AK3PUBT','Welding Inspector, International Welding Engineer','NDT Level II (MT/PT, UT, RI)','CSWIP 3.1 International Welding Inspector','Tank, Pressure Vessel, & Piping Inspector']],['Bidang Engineering',['Pipa Stress Analysis (Caesar II)','Design Calculation (Compress & PV Ellite)','3D Modelling Inventor']]]],
+  ['Didik Lesmana','Boiler Inspector',IMG+'1mEqU752SAFDGGWkO9J9qEYlnvxGC_O2g=s1024','didik.lesmana',[['Spesialisasi',['AK3PUBT','Personal NDT PT & MT Level 2','Welding Inspector','Pressure Vessel Inspector','Tank Inspector']]]],
+  ['Fredy Adnansyah','Boiler Inspector',IMG+'16gTFaK9Ym849AWhTOtAOXoFAv0-cUYnG=s1024','fredy.adnansyah',[['Spesialisasi',['AK3PUBT','Boiler & Pressure Vessel Inspector','Rotating Equipment Inspector','Tank, Platform, & Installation Inspector','NDT Level II (PT, MT, UTG)','Welding Inspector','Basic Corrosion Inspector']]]],
+  ['Waluya Utama','Boiler Inspector',IMG+'1xxCjMVB2L8JI3_3FOb2k7KIk_0y_Kgta=s1024','waluya.utama',[['Spesialisasi',['AK3PUBT','NDT Ultrasonic Test','Welding Inspection','Pressure Vessel']]]],
+  ['Mountadsuli Febrialam','Boiler Inspector',IMG+'1PPAHFVFvvqba81ZpV3Op14B-jauoYaa0=s1024','mountadsuli.febrialam',[['Spesialisasi',['AK3PUBT','BNSP Pressure Vessel Inspector','Pressure Vessel Inspector','Pipeline Inspector','Storage Tank Inspector','Plant Maintenance Management System','Vibration Analysis']]]]
+];
+$('people').innerHTML = PEOPLE.map(p => '<article class="person"><div class="band"></div><img src="' + p[2] + '" alt="' + esc(p[0]) + '" loading="lazy"><h2>' + esc(p[0]) + '</h2><p class="role">' + esc(p[1]) + '</p>'
+  + p[4].map(g => '<div class="grp"><small>' + esc(g[0]) + '</small><div class="chips">' + g[1].map(x => '<span>' + esc(x) + '</span>').join('') + '</div></div>').join('')
+  + '<a class="mail" href="mailto:' + p[3] + '@sinarmas-agri.com">Kirim email</a></article>').join('');
+const track = $('people'), dotsEl = $('pdots');
+const cards = () => [...track.children];
+let ci = 0, lockUntil = 0, scrollT, autoPause = false, autoResumeT;
+
+function idxFromScroll(){
+  const c = cards(); if (!c.length) return 0;
+  const max = track.scrollWidth - track.clientWidth;
+  if (max > 4) {
+    if (track.scrollLeft <= 2) return 0;
+    if (track.scrollLeft >= max - 2) return c.length - 1;
+  }
+  const mid = track.scrollLeft + track.clientWidth / 2;
+  let best = 0, bd = 1e9;
+  c.forEach((el, i) => { const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid); if (d < bd) { bd = d; best = i; } });
+  return best;
 }
-boot();
-if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+function mark(){
+  cards().forEach((c, k) => c.classList.toggle('on', k === ci));
+  [...dotsEl.children].forEach((d, k) => d.classList.toggle('on', k === ci));
+}
+function goCard(i){
+  const c = cards(); if (!c.length) return;
+  ci = (i + c.length) % c.length;
+  const el = c[ci];
+  lockUntil = Date.now() + 900;
+  track.scrollTo({ left: Math.max(0, el.offsetLeft - (track.clientWidth - el.offsetWidth) / 2), behavior: 'smooth' });
+  mark();
+}
+const slide = d => goCard(ci + d);
+
+dotsEl.innerHTML = PEOPLE.map((p, i) => '<button aria-label="' + esc(p[0]) + '" onclick="goCard(' + i + ')"></button>').join('');
+
+// sinkron saat user swipe manual (diabaikan sebentar setelah geseran otomatis)
+track.addEventListener('scroll', () => {
+  clearTimeout(scrollT);
+  scrollT = setTimeout(() => { if (Date.now() > lockUntil) { ci = idxFromScroll(); mark(); } }, 140);
+}, { passive: true });
+
+SHOW.profilePage = () => setTimeout(() => goCard(0), 60);
+
+/* autoplay 3,5 detik: berhenti saat hover/sentuh */
+const holdAuto = () => { autoPause = true; clearTimeout(autoResumeT); };
+const releaseAuto = ms => { clearTimeout(autoResumeT); autoResumeT = setTimeout(() => { autoPause = false; }, ms); };
+const cw = document.querySelector('.cwrap');
+cw.addEventListener('mouseenter', holdAuto);
+cw.addEventListener('mouseleave', () => releaseAuto(600));
+cw.addEventListener('touchstart', holdAuto, { passive: true });
+cw.addEventListener('touchend', () => releaseAuto(4000), { passive: true });
+setInterval(() => {
+  if (CUR !== 'profilePage' || autoPause || document.hidden) return;
+  goCard(ci + 1);
+}, 3500);
+window.addEventListener('resize', mark);
+
+/* ===== MINBOI ===== */
+const chatFAB = $('chatFAB'), chatModal = $('aiChatWidget'), aiInput = $('aiUserInput'), aiBtn = $('aiSendBtn'), aiMessages = $('aiMessages');
+chatFAB.onclick = () => { chatModal.classList.toggle('visible'); if (chatModal.classList.contains('visible')) aiInput.focus(); };
+$('closeChatBtn').onclick = () => chatModal.classList.remove('visible');
+aiBtn.onclick = sendAIChat;
+aiInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendAIChat(); });
+function appendMessage(text, sender) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + sender; div.innerHTML = esc(text).replace(/\n/g, '<br>');
+  aiMessages.appendChild(div); $('aiChatBody').scrollTop = $('aiChatBody').scrollHeight;
+}
+function sendAIChat() {
+  const t = aiInput.value.trim(); if (!t) return;
+  appendMessage(t, 'user'); aiInput.value = ''; aiInput.disabled = aiBtn.disabled = true;
+  const fin = () => { aiInput.disabled = aiBtn.disabled = false; aiInput.focus(); };
+  gs('getAIChatResponse', [t], r => { appendMessage(r, 'bot'); fin(); }, e => { appendMessage('❌ Error: ' + (e.message || e), 'bot'); fin(); });
+}
 </script>
 </body>
 </html>
